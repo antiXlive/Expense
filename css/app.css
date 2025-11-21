@@ -1,0 +1,159 @@
+/* Global tokens, animations, and custom styles for the PWA (dark-only) */
+
+
+:root {
+  --accent: #3b82f6;
+  --bg: #0f172a;
+  --card: #111827;
+  --muted: #94a3b8;
+  --glass: rgba(255, 255, 255, 0.03);
+  --radius: 14px;
+  --shadow: 0 6px 24px rgba(2, 6, 23, 0.6);
+}
+
+/* safe-area for bottom nav */
+.app-tabbar {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #2f3a44;
+  /* page background similar to screenshot — optional */
+}
+
+/* subtle tweak: ensure nav labels match desired weight/size */
+
+
+/* overlay fade */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms var(--anim-ease);
+}
+
+.overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* sliding sheet from bottom */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -120%;
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(8, 10, 15, 0.98));
+  box-shadow: var(--shadow);
+  transition: transform 320ms var(--anim-ease), bottom 320ms var(--anim-ease);
+  transform: translateY(100%);
+}
+
+.sheet.show {
+  transform: translateY(0);
+  bottom: 0;
+}
+
+/* picker slide from right */
+.picker {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: -100%;
+  width: 92%;
+  max-width: 520px;
+  background: var(--card);
+  transition: right 320ms var(--anim-ease);
+  box-shadow: var(--shadow);
+}
+
+.picker.show {
+  right: 0;
+}
+
+/* small helpers */
+.hidden {
+  display: none !important;
+}
+
+.screen {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  inset: 0;
+  padding-bottom: 72px;
+}
+
+.app-fab {
+  position: fixed;
+  right: 20px;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(180deg, var(--accent), #2563eb);
+  color: white;
+  z-index: 50;
+}
+
+/* tx card */
+.tx-card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* micro animations */
+.fade-in {
+  animation: fadeIn .28s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* dialog default */
+dialog {
+  background: var(--card);
+  color: inherit;
+  border-radius: 12px;
+  padding: 16px;
+  border: none;
+}
+
+/* small screen tweaks */
+@media (min-width:640px) {
+  .sheet {
+    width: 560px;
+    left: 50%;
+    transform: translate(-50%, 100%);
+  }
+
+  .sheet.show {
+    transform: translate(-50%, 0);
+    bottom: 24px;
+  }
+}
