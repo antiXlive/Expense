@@ -176,8 +176,8 @@ class TabBar extends HTMLElement {
           top: -30px;
           left: 50%;
           transform: translateX(-50%);
-          width: 70px;
-          height: 70px;
+          width: 68px;
+          height: 68px;
           border-radius: 999px;
 
           background: linear-gradient(45deg, #2563eb, #06b6d4, #2dd4bf);
@@ -199,10 +199,18 @@ class TabBar extends HTMLElement {
         }
 
         .fab svg {
-          width: 34px; height: 34px;
+          width: 45px; height: 45px;
           stroke: white;
-          stroke-width: 2.6;
+          stroke-width: 2.75;
         }
+          /* BUDGET INACTIVE FIX */
+#budget svg { 
+  opacity: 0.40;
+}
+#budget.active svg {
+  opacity: 1;
+}
+
       </style>
 
       <svg width="0" height="0">
