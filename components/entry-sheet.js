@@ -610,60 +610,40 @@ class EntrySheet extends HTMLElement {
   }
 
   _renderCategories() {
-    this.$catList.innerHTML = '';
+  this.$catList.innerHTML = '';
 
-    if (!this._categories || this._categories.length === 0) {
-      this.$catList.innerHTML = '<div class="empty-state">No categories available</div>';
-      return;
-    }
-
-    this._categories.forEach(cat => {
-      const item = document.createElement('div');
-      item.className = 'cat-item';
-      item.innerHTML = `
-        <span class="cat-emoji">${cat.emoji || '🏷️'}</span>
-        <span class="cat-name">${cat.name || 'Unnamed'}</span>
-      `;
-      
-      item.addEventListener('click', () => this._onCategoryClick(cat));
-      this.$catList.appendChild(item);
-    });
+  if (!this._categories?.length) {
+    this.$catList.innerHTML = '<div class="empty-state">No categories available</div>';
+    return;
   }
 
-  _onCategoryClick(cat) {
-    // Double-click detection
-    if (this._selectedCatId === cat.id) {
-      this._clickCount++;
-      clearTimeout(this._clickTimer);
+  this._categories.forEach(cat => {
+    const item = document.createElement('div');
+    item.className = 'cat-item';
+    item.innerHTML = `
+      <span class="cat-emoji">${cat.emoji || '🏷️'}</span>
+      <span class="cat-name">${cat.name || 'Unnamed'}</span>
+    `;
 
-      if (this._clickCount === 2) {
-        // Double click - select category with "Other"
-        this._selectCategory(cat, null);
-        this._clickCount = 0;
-        return;
-      }
+    // PASS the item element
+    item.addEventListener('click', () => this._onCategoryClick(cat, item));
 
-      this._clickTimer = setTimeout(() => {
-        this._clickCount = 0;
-      }, 300);
-    } else {
-      this._clickCount = 1;
-      this._selectedCatId = cat.id;
+    this.$catList.appendChild(item);
+  });
+}
 
-      this._clickTimer = setTimeout(() => {
-        this._clickCount = 0;
-      }, 300);
-    }
+_onCategoryClick(cat, itemEl) {
+  // highlight selected category
+  this.$catList.querySelectorAll('.cat-item')
+    .forEach(i => i.classList.remove('active'));
 
-    // Highlight selected category
-    this.$catList.querySelectorAll('.cat-item').forEach(item => {
-      item.classList.remove('active');
-    });
-    event.target.closest('.cat-item').classList.add('active');
+  itemEl.classList.add('active');
+  this._selectedCatId = cat.id;
 
-    // Render subcategories
-    this._renderSubcategories(cat);
-  }
+  // render subs
+  this._renderSubcategories(cat);
+}
+
 
   _renderSubcategories(cat) {
     this.$subList.innerHTML = '';

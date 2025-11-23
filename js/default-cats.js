@@ -1,7 +1,7 @@
 // /js/default-cats.js
 export const DEFAULT_CATEGORIES = [
   {
-    name: "Food & Dining 🍽️",
+    name: "Food & Dining",
     emoji: "🍽️",
     subcategories: [
       { name: "Restaurants & Cafes 🍴" },
@@ -18,7 +18,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Shopping 🛍️",
+    name: "Shopping",
     emoji: "🛍️",
     subcategories: [
       { name: "Clothing 👕" },
@@ -35,7 +35,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Transportation 🚗",
+    name: "Transportation",
     emoji: "🚗",
     subcategories: [
       { name: "Petrol/Diesel ⛽" },
@@ -53,7 +53,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Bills & Utilities 💡",
+    name: "Bills & Utilities",
     emoji: "💡",
     subcategories: [
       { name: "Electricity Bill ⚡" },
@@ -70,7 +70,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Health & Medical 💊",
+    name: "Health & Medical",
     emoji: "💊",
     subcategories: [
       { name: "Doctor Consultation 🏥" },
@@ -89,7 +89,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Entertainment 🎬",
+    name: "Entertainment",
     emoji: "🎬",
     subcategories: [
       { name: "Movies 🎥" },
@@ -105,7 +105,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Education 🎓",
+    name: "Education",
     emoji: "🎓",
     subcategories: [
       { name: "School/College Fees 🏫" },
@@ -120,7 +120,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Family & Personal 👨‍👩‍👦",
+    name: "Family & Personal",
     emoji: "👨‍👩‍👦",
     subcategories: [
       { name: "Salon/Barber ✂️" },
@@ -137,7 +137,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Personal Lifestyle (Men) 💼",
+    name: "Personal Lifestyle (Men)",
     emoji: "💼",
     subcategories: [
       { name: "Beard Grooming ✂️" },
@@ -152,7 +152,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Digital & Tech 📱",
+    name: "Digital & Tech",
     emoji: "📱",
     subcategories: [
       { name: "Cloud Storage ☁️" },
@@ -164,7 +164,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Vehicle Lifestyle 🚘",
+    name: "Vehicle Lifestyle",
     emoji: "🚘",
     subcategories: [
       { name: "Helmet/Riding Gear 🪖" },
@@ -177,7 +177,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Family Responsibilities (India) 👨‍👩‍👧",
+    name: "Family Responsibilities (India)",
     emoji: "👨‍👩‍👧",
     subcategories: [
       { name: "Parents’ Medicines 💊" },
@@ -189,7 +189,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Cash & Small Expenses 💸",
+    name: "Cash & Small Expenses",
     emoji: "💸",
     subcategories: [
       { name: "Cash Tips 💵" },
@@ -201,7 +201,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Insurance 🛡️",
+    name: "Insurance",
     emoji: "🛡️",
     subcategories: [
       { name: "Vehicle Insurance 🚗" },
@@ -214,7 +214,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Work & Career 💼",
+    name: "Work & Career",
     emoji: "💼",
     subcategories: [
       { name: "Office Supplies 🧾" },
@@ -232,7 +232,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Events & Occasions 🎉",
+    name: "Events & Occasions",
     emoji: "🎉",
     subcategories: [
       { name: "Birthday Parties 🎂" },
@@ -247,7 +247,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Travel & Vacation ✈️",
+    name: "Travel & Vacation",
     emoji: "✈️",
     subcategories: [
       { name: "Hotel 🏨" },
@@ -264,7 +264,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Lending & Borrowing 💸",
+    name: "Lending & Borrowing",
     emoji: "💸",
     subcategories: [
       { name: "Money Lent 🤝" },
@@ -274,7 +274,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Miscellaneous 📦",
+    name: "Miscellaneous",
     emoji: "📦",
     subcategories: [
       { name: "Bank Charges 🏦" },
@@ -288,7 +288,7 @@ export const DEFAULT_CATEGORIES = [
   },
 
   {
-    name: "Emergency 🚨",
+    name: "Emergency",
     emoji: "🚨",
     subcategories: [
       { name: "Medical Emergency 🚑" },
