@@ -5,10 +5,16 @@ export const db = new Dexie("expense_manager");
 
 db.version(1).stores({
   transactions: "++id, amount, date, catId, subId, note",
-  categories: "++id, name, icon",
+
+  // Store whole category object including emoji + subcategories array
+  categories: "++id, name, emoji, subcategories",
+
+  // If using separate sub-table
   subcategories: "++id, catId, name",
+
   settings: "key,value"
 });
+
 
 // Export JSON backup
 export async function dbExportJSON() {

@@ -1,5 +1,5 @@
 // /js/app.js — FINAL PRODUCTION ROUTER
-import { state, loadSnapshot, loadFromDexie, saveSnapshot, setLastBackup } from "./state.js";
+import { state, loadSnapshot, loadFromDexie, saveSnapshot, setLastBackup, getCategories } from "./state.js";
 import { dbExportJSON } from "./db.js";
 import { EventBus } from "./event-bus.js";
 
@@ -28,6 +28,7 @@ export async function boot() {
     loadSnapshot();
     setupRouting();
     await loadFromDexie();
+    getCategories(); // Preload categories
     setupListeners();
     setupAutoBackupScheduler();
 
@@ -86,7 +87,7 @@ export function navigateTo(tab, opts = {}) {
 
   const screenId = ROUTES[key];
   const target = document.getElementById(screenId);
-  
+
   if (!target) {
     console.error(`Screen element not found: ${screenId} for route: ${key}`);
     return;
@@ -144,7 +145,7 @@ function setupAutoBackupScheduler() {
   // Run immediately if overdue
   const now = Date.now();
   const elapsed = now - (state.lastBackup || 0);
-  
+
   if (elapsed >= BACKUP_INTERVAL) {
     runAutoBackup();
   }
