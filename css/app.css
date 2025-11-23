@@ -26,6 +26,17 @@ body {
 
 /* subtle tweak: ensure nav labels match desired weight/size */
 
+/* Prevent content from hiding behind floating tab-bar */
+.screen {
+  padding-bottom: 100px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling for better UX */
+.screen {
+  scroll-behavior: smooth;
+}
 
 /* overlay fade */
 .overlay {

@@ -1,5 +1,5 @@
 // components/tab-bar.js
-// FINAL — AI icon fixed (inactive + glow active), fully consistent
+// FINAL PRODUCTION — Stable navigation with proper event sync
 
 import { EventBus } from "../js/event-bus.js";
 
@@ -13,16 +13,23 @@ class TabBar extends HTMLElement {
 
   connectedCallback() {
     this._bind();
-    EventBus.on?.("navigated", (to) => this.setActive(to));
+
+    // Listen to "navigated" event to sync active state
+    EventBus.on("navigated", ({ to }) => {
+      if (to) this.setActive(to);
+    });
   }
 
   disconnectedCallback() {
-    try { EventBus.off?.("navigated"); } catch (_) {}
+    try { 
+      EventBus.off("navigated"); 
+    } catch (_) {}
   }
 
   _bind() {
     const $ = (id) => this.shadowRoot.getElementById(id);
 
+    // Bind tab clicks
     ["home", "ai", "budget", "settings"].forEach((id) => {
       const el = $(id);
       if (!el) return;
@@ -36,7 +43,8 @@ class TabBar extends HTMLElement {
       });
     });
 
-    const fab = this.shadowRoot.getElementById("addBtn");
+    // Bind FAB (add button)
+    const fab = $("addBtn");
     fab?.addEventListener("click", () => {
       this._triggerFabTap();
       EventBus.emit("open-entry-sheet", {});
@@ -46,14 +54,15 @@ class TabBar extends HTMLElement {
   _triggerFabTap() {
     const fab = this.shadowRoot.getElementById("addBtn");
     if (!fab) return;
-
     fab.classList.remove("tap-release");
-    void fab.offsetWidth;
+    void fab.offsetWidth; // Force reflow
     fab.classList.add("tap-release");
   }
 
   activate(tab) {
+    // Emit navigation event (router will handle it)
     EventBus.emit("navigate", { to: tab });
+    // Optimistically set active state (will be confirmed by "navigated" event)
     this.setActive(tab);
   }
 
@@ -137,7 +146,7 @@ class TabBar extends HTMLElement {
         #settings svg { opacity: 0.40; }
         #settings.active svg { opacity: 1; }
 
-        /* AI — RESET */
+        /* AI GRADIENT GLOW */
         #ai svg {
           opacity: 0.40;
           stroke: currentColor;
@@ -170,7 +179,7 @@ class TabBar extends HTMLElement {
           }
         }
 
-        /* FAB */
+        /* FAB (Floating Action Button) */
         .fab {
           position: absolute;
           top: -30px;
@@ -192,6 +201,7 @@ class TabBar extends HTMLElement {
 
           transition: transform 140ms cubic-bezier(.2,.6,.3,1),
                       box-shadow 180ms ease;
+          cursor: pointer;
         }
 
         .fab:active {
@@ -203,14 +213,10 @@ class TabBar extends HTMLElement {
           stroke: white;
           stroke-width: 2.75;
         }
-          /* BUDGET INACTIVE FIX */
-#budget svg { 
-  opacity: 0.40;
-}
-#budget.active svg {
-  opacity: 1;
-}
 
+        /* BUDGET */
+        #budget svg { opacity: 0.40; }
+        #budget.active svg { opacity: 1; }
       </style>
 
       <svg width="0" height="0">
@@ -235,7 +241,7 @@ class TabBar extends HTMLElement {
             <div class="label">Home</div>
           </div>
 
-          <!-- AI (NEW ICON) -->
+          <!-- AI -->
           <div id="ai" class="tab" tabindex="0">
             <svg viewBox="0 0 24 24" width="31" height="31">
               <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2"/>
