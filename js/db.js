@@ -1,7 +1,11 @@
 // /js/db.js
 import Dexie from "https://cdn.jsdelivr.net/npm/dexie@3.2.2/dist/dexie.mjs";
 
+
+
 export const db = new Dexie("expense_manager");
+window.db = db;
+
 
 db.version(1).stores({
   transactions: "++id, amount, date, catId, subId, note",

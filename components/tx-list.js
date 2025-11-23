@@ -16,6 +16,8 @@ class TxList extends HTMLElement {
     EventBus.on('tx-deleted', (id) => this.removeTx(id));
     EventBus.on('navigated', (to) => EventBus.emit('show-fab', to === 'home'));
     EventBus.on('show-fab', (v) => this.toggleFAB(v));
+    this.render();
+    EventBus.on("tx-updated", () => this.render());
     // request initial data
     setTimeout(()=> EventBus.emit('request-data'), 50);
   }

@@ -1,9 +1,19 @@
-// /js/app.js — FINAL PRODUCTION ROUTER
-import { state, loadSnapshot, loadFromDexie, saveSnapshot, setLastBackup, getCategories } from "./state.js";
-import { dbExportJSON } from "./db.js";
+// /js/app.js — FINAL PRODUCTION ROUTER + TX HANDLERS
+import {
+  state,
+  loadSnapshot,
+  loadFromDexie,
+  saveSnapshot,
+  setLastBackup,
+  getCategories
+} from "./state.js";
+
+import { dbExportJSON, db } from "./db.js";
 import { EventBus } from "./event-bus.js";
 
-// Constants
+// ======================================================
+//                   CONSTANTS
+// ======================================================
 const BACKUP_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 
 const SCREEN_IDS = {
@@ -12,23 +22,68 @@ const SCREEN_IDS = {
   SETTINGS: "settings-screen-wrap"
 };
 
-// Map tabs → screen IDs
-// Note: stats and budget share the same screen (tabs within stats-screen)
 const ROUTES = {
   home: SCREEN_IDS.HOME,
   stats: SCREEN_IDS.STATS,
-  budget: SCREEN_IDS.STATS, // Shares screen with stats
+  budget: SCREEN_IDS.STATS,
   settings: SCREEN_IDS.SETTINGS,
-  ai: null // AI is overlay, not a screen
+  ai: null
 };
 
-// --------------------------- BOOT ---------------------------
+// ======================================================
+//            TRANSACTION EVENT HANDLERS
+// ======================================================
+
+// ---- ADD ----
+EventBus.on("tx-add", async (data) => {
+  const id = await db.transactions.add(data);
+  data.id = id;
+
+  state.tx.push(data);
+  saveSnapshot();
+
+  EventBus.emit("tx-added", data);
+  EventBus.emit("tx-updated", data);
+  EventBus.emit("db-loaded", { tx: state.tx });
+});
+
+// ---- SAVE/UPDATE ----
+EventBus.on("tx-save", async (data) => {
+  await db.transactions.put(data);
+
+  const i = state.tx.findIndex(t => t.id === data.id);
+  if (i !== -1) state.tx[i] = data;
+
+  saveSnapshot();
+
+  EventBus.emit("tx-updated", data);
+  EventBus.emit("tx-saved", data);
+  EventBus.emit("db-loaded", { tx: state.tx });
+});
+
+// ---- DELETE ----
+EventBus.on("tx-delete", async (id) => {
+  await db.transactions.delete(id);
+
+  state.tx = state.tx.filter(t => t.id !== id);
+  saveSnapshot();
+
+  EventBus.emit("tx-deleted", id);
+  EventBus.emit("tx-updated", id);
+  EventBus.emit("db-loaded", { tx: state.tx });
+});
+
+// ======================================================
+//                      BOOT
+// ======================================================
 export async function boot() {
   try {
     loadSnapshot();
     setupRouting();
+
     await loadFromDexie();
-    getCategories(); // Preload categories
+    getCategories();
+
     setupListeners();
     setupAutoBackupScheduler();
 
@@ -36,26 +91,22 @@ export async function boot() {
     navigateTo(initial, { replaceHistory: true });
   } catch (err) {
     console.error("Boot failed:", err);
-    // Fallback to home screen
     navigateTo("home", { replaceHistory: true });
   }
 }
 
-// --------------------------- ROUTER ---------------------------
+// ======================================================
+//                      ROUTER
+// ======================================================
 function setupRouting() {
-  // PRIMARY NAVIGATION HANDLER
-  EventBus.on("navigate", (payload) => {
-    const to = payload?.to;
-    if (!to) return;
-    navigateTo(to);
+  EventBus.on("navigate", ({ to }) => {
+    if (to) navigateTo(to);
   });
 
-  // LEGACY EVENT NAME SUPPORT
   EventBus.on("navigate-to", (to) => {
     if (typeof to === "string") navigateTo(to);
   });
 
-  // BROWSER BACK/FORWARD
   window.addEventListener("popstate", (e) => {
     const screen = e.state?.screen || location.hash.replace("#", "") || "home";
     navigateTo(screen, { replaceHistory: true });
@@ -63,19 +114,15 @@ function setupRouting() {
 }
 
 export function navigateTo(tab, opts = {}) {
-  const { replaceHistory = false } = opts;
   const key = (tab || "").toLowerCase().trim();
+  const { replaceHistory = false } = opts;
 
-  // Validate route exists
   if (!ROUTES.hasOwnProperty(key)) {
-    console.warn(`Unknown route: "${tab}", redirecting to home`);
-    if (key !== "home") {
-      navigateTo("home", opts);
-    }
+    console.warn(`Unknown route "${key}", redirecting to home`);
+    navigateTo("home", opts);
     return;
   }
 
-  // AI is special case - overlay only, updates lastScreen
   if (key === "ai") {
     state.lastScreen = "ai";
     saveSnapshot();
@@ -89,24 +136,20 @@ export function navigateTo(tab, opts = {}) {
   const target = document.getElementById(screenId);
 
   if (!target) {
-    console.error(`Screen element not found: ${screenId} for route: ${key}`);
+    console.error(`Screen not found: ${screenId}`);
     return;
   }
 
-  // Hide all screens
-  document.querySelectorAll(".screen").forEach((s) => s.classList.add("hidden"));
+  document.querySelectorAll(".screen")
+    .forEach(s => s.classList.add("hidden"));
 
-  // Show active screen
   target.classList.remove("hidden");
 
-  // Save last screen
   state.lastScreen = key;
   saveSnapshot();
 
-  // Update URL and history
   updateURL(key, replaceHistory);
 
-  // Notify tab-bar (send object format to match tab-bar's listener)
   EventBus.emit("navigated", { to: key });
 }
 
@@ -119,7 +162,9 @@ function updateURL(key, replaceHistory) {
   }
 }
 
-// --------------------------- LISTENERS ---------------------------
+// ======================================================
+//                     SETTINGS LISTENER
+// ======================================================
 function setupListeners() {
   EventBus.on("settings-update", (updates) => {
     try {
@@ -132,9 +177,10 @@ function setupListeners() {
   });
 }
 
-// --------------------------- AUTO BACKUP ---------------------------
+// ======================================================
+//                     AUTO BACKUP
+// ======================================================
 function setupAutoBackupScheduler() {
-  // Clear existing interval
   if (window.__autoBackupInterval) {
     clearInterval(window.__autoBackupInterval);
     window.__autoBackupInterval = null;
@@ -142,7 +188,6 @@ function setupAutoBackupScheduler() {
 
   if (!state.settings.autoBackup) return;
 
-  // Run immediately if overdue
   const now = Date.now();
   const elapsed = now - (state.lastBackup || 0);
 
@@ -150,8 +195,10 @@ function setupAutoBackupScheduler() {
     runAutoBackup();
   }
 
-  // Schedule recurring backups
-  window.__autoBackupInterval = setInterval(runAutoBackup, BACKUP_INTERVAL);
+  window.__autoBackupInterval = setInterval(
+    runAutoBackup,
+    BACKUP_INTERVAL
+  );
 }
 
 export function runAutoBackup() {
@@ -165,5 +212,7 @@ export function runAutoBackup() {
   }
 }
 
-// --------------------------- AUTO-BOOT ---------------------------
+// ======================================================
+//                     AUTO-BOOT
+// ======================================================
 boot();

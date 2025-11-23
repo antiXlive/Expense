@@ -28,7 +28,7 @@ class TxItem extends HTMLElement {
           </div>
         </div>
         <div class="actions">
-          <div class="amount" id="amount">$0</div>
+          <div class="amount" id="amount">Pk$0</div>
         </div>
       </div>
     `;
