@@ -1,13 +1,14 @@
-// /js/state.js
-import { db } from "./db.js";
+// /js/state.js - OPTIMIZED WITH CACHING & ACTIONS
+import { db, getTransactionsByMonth, getTransactionsByDateRange } from "./db.js";
 import { DEFAULT_CATEGORIES } from "./default-cats.js";
+import { EventBus } from "./event-bus.js";
 
 //
 // ======================================================
 //                GLOBAL APPLICATION STATE
 // ======================================================
 export const state = {
-  tx: [],
+  tx: [], // Keep full list for backward compatibility
   categories: [],
   subcategories: [],
 
@@ -18,7 +19,221 @@ export const state = {
   },
 
   lastBackup: 0,
+  lastScreen: "home",
 };
+
+//
+// ======================================================
+//                MONTHLY CACHE SYSTEM
+// ======================================================
+const cache = {
+  monthly: {}, // "2025-01": { transactions: [...], loaded: timestamp }
+  yearly: {},  // "2025": { transactions: [...], loaded: timestamp }
+  categories: null,
+  lastFullLoad: 0,
+};
+
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes - cache expires after this
+
+/**
+ * Get transactions for a specific month (with caching)
+ * @param {string} yearMonth - Format: "2025-01"
+ * @returns {Promise<Array>} Cached or fresh transactions
+ */
+export async function getMonthTransactions(yearMonth) {
+  const now = Date.now();
+  const cached = cache.monthly[yearMonth];
+
+  // Return cached if valid and fresh
+  if (cached && (now - cached.loaded) < CACHE_TTL) {
+    console.log(`📦 Using cached data for ${yearMonth}`);
+    return cached.transactions;
+  }
+
+  // Load from database
+  console.log(`🔄 Loading ${yearMonth} from database...`);
+  const transactions = await getTransactionsByMonth(yearMonth);
+  
+  // Enrich transactions with category/subcategory data
+  const enriched = transactions.map(enrichTx);
+
+  // Cache the result
+  cache.monthly[yearMonth] = {
+    transactions: enriched,
+    loaded: now
+  };
+
+  return enriched;
+}
+
+/**
+ * Get transactions for a date range (with caching for year)
+ * @param {string} startDate - Format: "2025-01-01"
+ * @param {string} endDate - Format: "2025-12-31"
+ * @returns {Promise<Array>}
+ */
+export async function getRangeTransactions(startDate, endDate) {
+  const year = startDate.substring(0, 4);
+  const isFullYear = startDate.endsWith('-01-01') && endDate.endsWith('-12-31');
+  
+  const now = Date.now();
+  const cached = cache.yearly[year];
+
+  // Use cached if it's a full year query and cache is fresh
+  if (isFullYear && cached && (now - cached.loaded) < CACHE_TTL) {
+    console.log(`📦 Using cached year data for ${year}`);
+    return cached.transactions;
+  }
+
+  // Load from database
+  const transactions = await getTransactionsByDateRange(startDate, endDate);
+  const enriched = transactions.map(enrichTx);
+
+  // Cache full year queries
+  if (isFullYear) {
+    cache.yearly[year] = {
+      transactions: enriched,
+      loaded: now
+    };
+  }
+
+  return enriched;
+}
+
+/**
+ * Invalidate cache for specific month (called on add/edit/delete)
+ * @param {string} date - Transaction date "2025-01-15"
+ */
+function invalidateCache(date) {
+  if (!date) return;
+  
+  const yearMonth = date.substring(0, 7); // "2025-01"
+  const year = date.substring(0, 4);      // "2025"
+  
+  delete cache.monthly[yearMonth];
+  delete cache.yearly[year];
+  
+  console.log(`🗑️ Cache invalidated for ${yearMonth}`);
+}
+
+/**
+ * Clear all caches
+ */
+export function clearCache() {
+  cache.monthly = {};
+  cache.yearly = {};
+  cache.categories = null;
+  cache.lastFullLoad = 0;
+  console.log("🗑️ All caches cleared");
+}
+
+//
+// ======================================================
+//      TRANSACTION ENRICHMENT (Add category info)
+// ======================================================
+function enrichTx(raw) {
+  const cat = state.categories.find(c => c.id === raw.catId);
+  const sub = state.subcategories.find(s => s.id === raw.subId);
+
+  return {
+    ...raw,
+    catName: cat?.name || null,
+    emoji: cat?.emoji || "🏷️",
+    subName: sub?.name || null
+  };
+}
+
+//
+// ======================================================
+//          TRANSACTION CRUD ACTIONS
+// ======================================================
+
+/**
+ * Add a new transaction
+ * @param {Object} txData - { amount, date, catId, subId, note }
+ * @returns {Promise<number>} New transaction ID
+ */
+export async function addTransaction(txData) {
+  // Enrich before saving
+  const tx = enrichTx(txData);
+  
+  // Save to database
+  const id = await db.transactions.add(tx);
+  tx.id = id;
+
+  // Update in-memory state
+  state.tx.push(tx);
+  saveSnapshot();
+
+  // Invalidate cache
+  invalidateCache(tx.date);
+
+  // Emit events
+  EventBus.emit("tx-added", tx);
+  EventBus.emit("tx-updated", tx);
+  EventBus.emit("db-loaded", { tx: state.tx });
+
+  console.log(`✅ Transaction added: ID ${id}`);
+  return id;
+}
+
+/**
+ * Update an existing transaction
+ * @param {Object} txData - Must include id
+ * @returns {Promise<void>}
+ */
+export async function updateTransaction(txData) {
+  const tx = enrichTx(txData);
+
+  // Update database
+  await db.transactions.put(tx);
+
+  // Update in-memory state
+  const i = state.tx.findIndex(t => t.id === tx.id);
+  if (i !== -1) {
+    state.tx[i] = tx;
+  }
+  saveSnapshot();
+
+  // Invalidate cache
+  invalidateCache(tx.date);
+
+  // Emit events
+  EventBus.emit("tx-updated", tx);
+  EventBus.emit("tx-saved", tx);
+  EventBus.emit("db-loaded", { tx: state.tx });
+
+  console.log(`✅ Transaction updated: ID ${tx.id}`);
+}
+
+/**
+ * Delete a transaction
+ * @param {number} id - Transaction ID
+ * @returns {Promise<void>}
+ */
+export async function deleteTransaction(id) {
+  // Find transaction to get its date for cache invalidation
+  const tx = state.tx.find(t => t.id === id);
+  
+  // Delete from database
+  await db.transactions.delete(id);
+
+  // Update in-memory state
+  state.tx = state.tx.filter(t => t.id !== id);
+  saveSnapshot();
+
+  // Invalidate cache
+  if (tx) {
+    invalidateCache(tx.date);
+  }
+
+  // Emit events
+  EventBus.emit("tx-deleted", id);
+  EventBus.emit("tx-updated", id);
+  EventBus.emit("db-loaded", { tx: state.tx });
+
+  console.log(`✅ Transaction deleted: ID ${id}`);
+}
 
 //
 // ======================================================
@@ -38,22 +253,30 @@ export function loadSnapshot() {
       ...(ss.settings || {}),
     };
     state.lastBackup = ss.lastBackup || 0;
+    state.lastScreen = ss.lastScreen || "home";
+
+    console.log(`📸 Snapshot loaded: ${state.tx.length} transactions`);
   } catch (e) {
     console.error("Snapshot load error:", e);
   }
 }
 
 export function saveSnapshot() {
-  localStorage.setItem(
-    "appSnapshot",
-    JSON.stringify({
-      tx: state.tx,
-      categories: state.categories,
-      subcategories: state.subcategories,
-      settings: state.settings,
-      lastBackup: state.lastBackup,
-    })
-  );
+  try {
+    localStorage.setItem(
+      "appSnapshot",
+      JSON.stringify({
+        tx: state.tx,
+        categories: state.categories,
+        subcategories: state.subcategories,
+        settings: state.settings,
+        lastBackup: state.lastBackup,
+        lastScreen: state.lastScreen,
+      })
+    );
+  } catch (e) {
+    console.error("Snapshot save error:", e);
+  }
 }
 
 export function setLastBackup(ts) {
@@ -80,17 +303,15 @@ async function initDefaultCategoriesIfNeeded() {
   
   if (corrupted.length > 0) {
     console.warn(`⚠️ Found ${corrupted.length} corrupted categories, removing...`);
-    // Delete corrupted entries by ID
     for (const cat of corrupted) {
       await db.categories.delete(cat.id);
-      // Also delete their subcategories
       await db.subcategories.where('catId').equals(cat.id).delete();
     }
   }
 
   // 3️⃣ Check for duplicate category names
   const names = existing
-    .filter(c => c.name && c.name.trim()) // Only valid names
+    .filter(c => c.name && c.name.trim())
     .map(c => c.name.trim());
   
   const uniqueNames = new Set(names);
@@ -98,7 +319,6 @@ async function initDefaultCategoriesIfNeeded() {
   if (names.length !== uniqueNames.size) {
     console.warn("⚠️ Duplicate categories detected, cleaning up...");
     
-    // Find which names are duplicated
     const nameCounts = new Map();
     for (const name of names) {
       nameCounts.set(name, (nameCounts.get(name) || 0) + 1);
@@ -108,12 +328,8 @@ async function initDefaultCategoriesIfNeeded() {
       .filter(([_, count]) => count > 1)
       .map(([name, _]) => name);
     
-    console.warn("Duplicates:", duplicateNames);
-    
-    // For each duplicate name, keep only the first one
     for (const dupName of duplicateNames) {
       const cats = await db.categories.where('name').equals(dupName).toArray();
-      // Keep the first, delete the rest
       for (let i = 1; i < cats.length; i++) {
         await db.categories.delete(cats[i].id);
         await db.subcategories.where('catId').equals(cats[i].id).delete();
@@ -124,32 +340,14 @@ async function initDefaultCategoriesIfNeeded() {
   // 4️⃣ After cleanup, reload and check if we need defaults
   const cleanedCategories = await db.categories.toArray();
   
-  // If after cleanup we have no categories, load defaults
   if (cleanedCategories.length === 0) {
     console.log("📌 No categories after cleanup, loading defaults...");
     await loadDefaults();
   }
 }
 
-// Actual inserter - ONLY called when we're sure DB is empty
 async function loadDefaults() {
   try {
-    // First, verify DEFAULT_CATEGORIES doesn't have duplicates
-    const defaultNames = DEFAULT_CATEGORIES.map(c => c.name);
-    const uniqueDefaultNames = new Set(defaultNames);
-    
-    if (defaultNames.length !== uniqueDefaultNames.size) {
-      console.error("❌ DEFAULT_CATEGORIES has duplicates:", defaultNames);
-      // Find and log duplicates
-      const nameCounts = {};
-      defaultNames.forEach(name => {
-        nameCounts[name] = (nameCounts[name] || 0) + 1;
-      });
-      const dups = Object.entries(nameCounts).filter(([_, count]) => count > 1);
-      console.error("Duplicate categories in defaults:", dups);
-    }
-    
-    // Use Set to deduplicate based on name
     const seenNames = new Set();
     const uniqueCategories = DEFAULT_CATEGORIES.filter(cat => {
       if (seenNames.has(cat.name)) {
@@ -163,14 +361,13 @@ async function loadDefaults() {
     console.log(`📦 Loading ${uniqueCategories.length} unique default categories...`);
     
     for (const cat of uniqueCategories) {
-      // Double-check database one more time
       const exists = await db.categories
         .where('name')
         .equals(cat.name)
         .first();
       
       if (exists) {
-        console.log(`⏭️ Skipping "${cat.name}" - already exists with ID ${exists.id}`);
+        console.log(`⏭️ Skipping "${cat.name}" - already exists`);
         continue;
       }
 
@@ -178,8 +375,6 @@ async function loadDefaults() {
         name: cat.name,
         emoji: cat.emoji
       });
-      
-      console.log(`✓ Added "${cat.name}" with ID ${catId}`);
 
       if (cat.subcategories?.length) {
         await db.subcategories.bulkAdd(
@@ -188,12 +383,10 @@ async function loadDefaults() {
             name: sub.name
           }))
         );
-        console.log(`  ↳ Added ${cat.subcategories.length} subcategories`);
       }
     }
     
-    const finalCount = await db.categories.count();
-    console.log(`✅ Defaults loaded successfully. Total categories: ${finalCount}`);
+    console.log(`✅ Defaults loaded successfully`);
   } catch (e) {
     console.error("❌ Error loading defaults:", e);
     throw e;
@@ -207,11 +400,18 @@ async function loadDefaults() {
 export async function loadFromDexie() {
   await initDefaultCategoriesIfNeeded();
 
+  // Load all transactions for backward compatibility
   state.tx = await db.transactions.toArray();
+  
+  // Enrich them with category data
+  state.tx = state.tx.map(enrichTx);
+
   state.categories = await db.categories.toArray();
   state.subcategories = await db.subcategories.toArray();
 
   saveSnapshot();
+  
+  console.log(`✅ Loaded ${state.tx.length} transactions, ${state.categories.length} categories`);
 }
 
 //
@@ -266,6 +466,7 @@ export async function setCategories(list) {
     state.subcategories = await db.subcategories.toArray();
 
     saveSnapshot();
+    clearCache(); // Categories changed, invalidate all caches
   } catch (e) {
     console.error("setCategories error:", e);
   }
@@ -290,20 +491,17 @@ export async function clearAll() {
 
   await initDefaultCategoriesIfNeeded();
   
-  // Reload state after clearing
   state.categories = await db.categories.toArray();
   state.subcategories = await db.subcategories.toArray();
   
   saveSnapshot();
+  clearCache();
 }
 
 //
 // ======================================================
-//              ONE-TIME CLEANUP UTILITY
+//              CLEANUP UTILITY
 // ======================================================
-// Run this once in console to fix existing duplicates:
-// import { cleanupDuplicateCategories } from './js/state.js'
-// await cleanupDuplicateCategories()
 export async function cleanupDuplicateCategories() {
   console.log("🧹 Starting cleanup...");
   
@@ -324,7 +522,6 @@ export async function cleanupDuplicateCategories() {
     if (cats.length > 1) {
       console.log(`Found ${cats.length} copies of "${name}"`);
       
-      // Keep the first one, delete the rest
       for (let i = 1; i < cats.length; i++) {
         console.log(`Deleting duplicate ID ${cats[i].id}`);
         await db.categories.delete(cats[i].id);
@@ -333,10 +530,10 @@ export async function cleanupDuplicateCategories() {
     }
   }
   
-  // Reload state
   state.categories = await db.categories.toArray();
   state.subcategories = await db.subcategories.toArray();
   saveSnapshot();
+  clearCache();
   
   console.log("✅ Cleanup complete!");
   return await db.categories.toArray();

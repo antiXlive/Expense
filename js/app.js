@@ -1,14 +1,17 @@
-// /js/app.js — FINAL PRODUCTION ROUTER + TX HANDLERS
+// /js/app.js — REFACTORED: ROUTER-ONLY ARCHITECTURE
 import {
   state,
   loadSnapshot,
   loadFromDexie,
   saveSnapshot,
   setLastBackup,
-  getCategories
+  getCategories,
+  addTransaction,
+  updateTransaction,
+  deleteTransaction
 } from "./state.js";
 
-import { dbExportJSON, db } from "./db.js";
+import { dbExportJSON } from "./db.js";
 import { EventBus } from "./event-bus.js";
 
 // ======================================================
@@ -31,65 +34,35 @@ const ROUTES = {
 };
 
 // ======================================================
-//       IMPORTANT: TRANSACTION CATEGORY ENRICHER
-// ======================================================
-function enrichTx(raw) {
-  const cat = state.categories.find(c => c.id === raw.catId);
-  const sub = state.subcategories.find(s => s.id === raw.subId);
-
-  return {
-    ...raw,
-    catName: cat?.name || null,
-    emoji: cat?.emoji || "🏷️",
-    subName: sub?.name || null
-  };
-}
-
-// ======================================================
 //            TRANSACTION EVENT HANDLERS
+//         (Now just thin wrappers to state.js)
 // ======================================================
 
-// ---- ADD ----
 EventBus.on("tx-add", async (data) => {
-  const tx = enrichTx(data);
-
-  const id = await db.transactions.add(tx);
-  tx.id = id;
-
-  state.tx.push(tx);
-  saveSnapshot();
-
-  EventBus.emit("tx-added", tx);
-  EventBus.emit("tx-updated", tx);
-  EventBus.emit("db-loaded", { tx: state.tx });
+  try {
+    await addTransaction(data);
+  } catch (err) {
+    console.error("Failed to add transaction:", err);
+    EventBus.emit("tx-error", { action: "add", error: err.message });
+  }
 });
 
-// ---- SAVE / UPDATE ----
 EventBus.on("tx-save", async (data) => {
-  const tx = enrichTx(data);
-
-  await db.transactions.put(tx);
-
-  const i = state.tx.findIndex(t => t.id === tx.id);
-  if (i !== -1) state.tx[i] = tx;
-
-  saveSnapshot();
-
-  EventBus.emit("tx-updated", tx);
-  EventBus.emit("tx-saved", tx);
-  EventBus.emit("db-loaded", { tx: state.tx });
+  try {
+    await updateTransaction(data);
+  } catch (err) {
+    console.error("Failed to update transaction:", err);
+    EventBus.emit("tx-error", { action: "update", error: err.message });
+  }
 });
 
-// ---- DELETE ----
 EventBus.on("tx-delete", async (id) => {
-  await db.transactions.delete(id);
-
-  state.tx = state.tx.filter(t => t.id !== id);
-  saveSnapshot();
-
-  EventBus.emit("tx-deleted", id);
-  EventBus.emit("tx-updated", id);
-  EventBus.emit("db-loaded", { tx: state.tx });
+  try {
+    await deleteTransaction(id);
+  } catch (err) {
+    console.error("Failed to delete transaction:", err);
+    EventBus.emit("tx-error", { action: "delete", error: err.message });
+  }
 });
 
 // ======================================================
@@ -97,19 +70,33 @@ EventBus.on("tx-delete", async (id) => {
 // ======================================================
 export async function boot() {
   try {
+    console.log("🚀 Booting application...");
+    
+    // 1. Load snapshot for instant UI
     loadSnapshot();
+    
+    // 2. Setup routing system
     setupRouting();
 
+    // 3. Load fresh data from IndexedDB
     await loadFromDexie();
+    
+    // 4. Get enriched categories
     getCategories();
 
+    // 5. Setup event listeners
     setupListeners();
+    
+    // 6. Setup auto-backup scheduler
     setupAutoBackupScheduler();
 
-    const initial = location.hash.replace("#", "") || state.lastScreen || "home";
-    navigateTo(initial, { replaceHistory: true });
+    // 7. Navigate to initial screen
+    const initialScreen = location.hash.replace("#", "") || state.lastScreen || "home";
+    navigateTo(initialScreen, { replaceHistory: true });
+    
+    console.log("✅ Boot complete!");
   } catch (err) {
-    console.error("Boot failed:", err);
+    console.error("❌ Boot failed:", err);
     navigateTo("home", { replaceHistory: true });
   }
 }
@@ -118,6 +105,7 @@ export async function boot() {
 //                      ROUTER
 // ======================================================
 function setupRouting() {
+  // Handle navigate events
   EventBus.on("navigate", ({ to }) => {
     if (to) navigateTo(to);
   });
@@ -126,21 +114,29 @@ function setupRouting() {
     if (typeof to === "string") navigateTo(to);
   });
 
+  // Handle browser back/forward buttons
   window.addEventListener("popstate", (e) => {
     const screen = e.state?.screen || location.hash.replace("#", "") || "home";
     navigateTo(screen, { replaceHistory: true });
   });
 }
 
+/**
+ * Navigate to a specific screen
+ * @param {string} tab - Route name (home, stats, settings, ai)
+ * @param {Object} opts - Options { replaceHistory: boolean }
+ */
 export function navigateTo(tab, opts = {}) {
   const key = (tab || "").toLowerCase().trim();
   const { replaceHistory = false } = opts;
 
+  // Validate route
   if (!ROUTES.hasOwnProperty(key)) {
     console.warn(`Unknown route "${key}", redirecting to home`);
     return navigateTo("home", opts);
   }
 
+  // Handle AI route (special case - no screen element)
   if (key === "ai") {
     state.lastScreen = "ai";
     saveSnapshot();
@@ -150,27 +146,40 @@ export function navigateTo(tab, opts = {}) {
     return;
   }
 
+  // Get screen element
   const screenId = ROUTES[key];
   const target = document.getElementById(screenId);
 
   if (!target) {
-    console.error(`Screen not found: ${screenId}`);
+    console.error(`Screen element not found: ${screenId}`);
     return;
   }
 
+  // Hide all screens
   document.querySelectorAll(".screen")
     .forEach(s => s.classList.add("hidden"));
 
+  // Show target screen
   target.classList.remove("hidden");
 
+  // Update state
   state.lastScreen = key;
   saveSnapshot();
 
+  // Update URL
   updateURL(key, replaceHistory);
 
+  // Emit navigation event
   EventBus.emit("navigated", { to: key });
+  
+  console.log(`📍 Navigated to: ${key}`);
 }
 
+/**
+ * Update browser URL and history
+ * @param {string} key - Route name
+ * @param {boolean} replaceHistory - Replace instead of push
+ */
 function updateURL(key, replaceHistory) {
   const hash = `#${key}`;
   if (replaceHistory) {
@@ -181,14 +190,19 @@ function updateURL(key, replaceHistory) {
 }
 
 // ======================================================
-//                     SETTINGS LISTENER
+//                     EVENT LISTENERS
 // ======================================================
 function setupListeners() {
+  // Settings update handler
   EventBus.on("settings-update", (updates) => {
     try {
       Object.assign(state.settings, updates);
       saveSnapshot();
+      
+      // Re-setup auto-backup if settings changed
       setupAutoBackupScheduler();
+      
+      console.log("⚙️ Settings updated:", updates);
     } catch (err) {
       console.error("Settings update failed:", err);
     }
@@ -199,34 +213,53 @@ function setupListeners() {
 //                     AUTO BACKUP
 // ======================================================
 function setupAutoBackupScheduler() {
+  // Clear existing interval
   if (window.__autoBackupInterval) {
     clearInterval(window.__autoBackupInterval);
     window.__autoBackupInterval = null;
   }
 
-  if (!state.settings.autoBackup) return;
+  // Exit if auto-backup is disabled
+  if (!state.settings.autoBackup) {
+    console.log("📴 Auto-backup disabled");
+    return;
+  }
 
+  // Check if backup is due
   const now = Date.now();
   const elapsed = now - (state.lastBackup || 0);
 
   if (elapsed >= BACKUP_INTERVAL) {
+    console.log("⏰ Running overdue backup...");
     runAutoBackup();
   }
 
+  // Schedule recurring backups
   window.__autoBackupInterval = setInterval(
     runAutoBackup,
     BACKUP_INTERVAL
   );
+  
+  console.log("✅ Auto-backup scheduler started");
 }
 
+/**
+ * Execute automatic backup
+ */
 export function runAutoBackup() {
-  if (!state.settings.autoBackup) return;
+  if (!state.settings.autoBackup) {
+    console.log("⏭️ Skipping backup (disabled)");
+    return;
+  }
 
   try {
+    console.log("💾 Running auto-backup...");
     dbExportJSON();
     setLastBackup(Date.now());
+    console.log("✅ Auto-backup complete!");
   } catch (err) {
-    console.error("Auto-backup failed:", err);
+    console.error("❌ Auto-backup failed:", err);
+    EventBus.emit("backup-error", { error: err.message });
   }
 }
 
