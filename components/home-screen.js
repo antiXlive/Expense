@@ -17,18 +17,32 @@ class HomeScreen extends HTMLElement {
   connectedCallback() {
     this._bind();
     this._loadMonth(this.current.getFullYear(), this.current.getMonth());
-    // refresh when db changes (other parts of app can emit)
-    EventBus.on("data-changed", () => this._loadMonth(this.current.getFullYear(), this.current.getMonth()));
-    EventBus.on("navigate", (p) => {
+    
+    // Store handler references for proper cleanup
+    this._txUpdatedHandler = () => this._loadMonth(this.current.getFullYear(), this.current.getMonth());
+    this._navigateHandler = (p) => {
       // close any expanded things if navigation occurs
       // noop for now
-    });
+    };
+    
+    // Listen to transaction events from app.js
+    EventBus.on("tx-updated", this._txUpdatedHandler);
+    EventBus.on("tx-added", this._txUpdatedHandler);
+    EventBus.on("tx-deleted", this._txUpdatedHandler);
+    EventBus.on("db-loaded", this._txUpdatedHandler);
+    EventBus.on("navigate", this._navigateHandler);
   }
 
   disconnectedCallback() {
     try {
-      EventBus.off("data-changed");
-    } catch (e) {}
+      EventBus.off("tx-updated", this._txUpdatedHandler);
+      EventBus.off("tx-added", this._txUpdatedHandler);
+      EventBus.off("tx-deleted", this._txUpdatedHandler);
+      EventBus.off("db-loaded", this._txUpdatedHandler);
+      EventBus.off("navigate", this._navigateHandler);
+    } catch (e) {
+      console.error("Error cleaning up listeners:", e);
+    }
   }
 
   // ---------- helpers ----------

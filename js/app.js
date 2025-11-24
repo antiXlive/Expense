@@ -31,33 +31,52 @@ const ROUTES = {
 };
 
 // ======================================================
+//       IMPORTANT: TRANSACTION CATEGORY ENRICHER
+// ======================================================
+function enrichTx(raw) {
+  const cat = state.categories.find(c => c.id === raw.catId);
+  const sub = state.subcategories.find(s => s.id === raw.subId);
+
+  return {
+    ...raw,
+    catName: cat?.name || null,
+    emoji: cat?.emoji || "🏷️",
+    subName: sub?.name || null
+  };
+}
+
+// ======================================================
 //            TRANSACTION EVENT HANDLERS
 // ======================================================
 
 // ---- ADD ----
 EventBus.on("tx-add", async (data) => {
-  const id = await db.transactions.add(data);
-  data.id = id;
+  const tx = enrichTx(data);
 
-  state.tx.push(data);
+  const id = await db.transactions.add(tx);
+  tx.id = id;
+
+  state.tx.push(tx);
   saveSnapshot();
 
-  EventBus.emit("tx-added", data);
-  EventBus.emit("tx-updated", data);
+  EventBus.emit("tx-added", tx);
+  EventBus.emit("tx-updated", tx);
   EventBus.emit("db-loaded", { tx: state.tx });
 });
 
-// ---- SAVE/UPDATE ----
+// ---- SAVE / UPDATE ----
 EventBus.on("tx-save", async (data) => {
-  await db.transactions.put(data);
+  const tx = enrichTx(data);
 
-  const i = state.tx.findIndex(t => t.id === data.id);
-  if (i !== -1) state.tx[i] = data;
+  await db.transactions.put(tx);
+
+  const i = state.tx.findIndex(t => t.id === tx.id);
+  if (i !== -1) state.tx[i] = tx;
 
   saveSnapshot();
 
-  EventBus.emit("tx-updated", data);
-  EventBus.emit("tx-saved", data);
+  EventBus.emit("tx-updated", tx);
+  EventBus.emit("tx-saved", tx);
   EventBus.emit("db-loaded", { tx: state.tx });
 });
 
@@ -119,8 +138,7 @@ export function navigateTo(tab, opts = {}) {
 
   if (!ROUTES.hasOwnProperty(key)) {
     console.warn(`Unknown route "${key}", redirecting to home`);
-    navigateTo("home", opts);
-    return;
+    return navigateTo("home", opts);
   }
 
   if (key === "ai") {
@@ -213,6 +231,6 @@ export function runAutoBackup() {
 }
 
 // ======================================================
-//                     AUTO-BOOT
+//                     AUTO BOOT
 // ======================================================
 boot();
