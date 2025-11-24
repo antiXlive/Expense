@@ -43,14 +43,16 @@
       <pin-screen class="screen hidden"></pin-screen>
 
 
+      <app-header></app-header>
       <section id="home-screen" class="screen">
         <home-screen></home-screen>
       </section>
+      <stats-screen id="stats-screen" class="screen hidden"></stats-screen>
 
 
-      <section id="stats-screen" class="screen hidden">
+      <!-- <section id="stats-screen" class="screen hidden">
         <stats-view></stats-view>
-      </section>
+      </section> -->
 
       <section id="settings-screen-wrap" class="screen hidden">
         <settings-screen></settings-screen>
@@ -79,12 +81,13 @@
   <!-- Components -->
   <script type="module" src="./components/entry-sheet.js"></script>
   <script type="module" src="./components/category-picker.js"></script>
-  <script type="module" src="./components/stats-view.js"></script>
+  <script type="module" src="./components/stats-screen.js"></script>
   <script type="module" src="./components/settings-screen.js"></script>
   <script type="module" src="./components/lock-screen.js"></script>
   <script type="module" src="./components/pin-screen.js"></script>
   <script type="module" src="./components/tab-bar.js"></script>
   <script type="module" src="./components/home-screen.js"></script>
+  <script type="module" src="./components/app-header.js"></script>
 
 
   <!-- Register service worker -->

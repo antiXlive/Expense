@@ -1,6 +1,6 @@
-// components/home-screen.js
+// components/home-screen.js - OPTIMIZED
 import { EventBus } from "../js/event-bus.js";
-import { db } from "../js/db.js";
+import { getMonthTransactions } from "../js/state.js";
 
 class HomeScreen extends HTMLElement {
   constructor() {
@@ -14,6 +14,7 @@ class HomeScreen extends HTMLElement {
     this._isAnimating = false;
     this._longPressTimer = null;
     this._onScrollBound = null;
+    this._currentYearMonth = null; // Track current loaded month
 
     this.render();
   }
@@ -22,15 +23,26 @@ class HomeScreen extends HTMLElement {
     this._bind();
     this._loadMonth(this.current.getFullYear(), this.current.getMonth());
 
-    this._txUpdatedHandler = () =>
-      this._loadMonth(this.current.getFullYear(), this.current.getMonth());
+    // Optimized: Only reload if data actually changed
+    this._txUpdatedHandler = (data) => {
+      // If we receive a specific transaction, check if it's in current month
+      if (data && data.date) {
+        const txYearMonth = data.date.substring(0, 7);
+        if (txYearMonth === this._currentYearMonth) {
+          this._loadMonth(this.current.getFullYear(), this.current.getMonth());
+        }
+      } else {
+        // Generic update, reload current month
+        this._loadMonth(this.current.getFullYear(), this.current.getMonth());
+      }
+    };
 
     EventBus.on("tx-updated", this._txUpdatedHandler);
     EventBus.on("tx-added", this._txUpdatedHandler);
     EventBus.on("tx-deleted", this._txUpdatedHandler);
     EventBus.on("db-loaded", this._txUpdatedHandler);
 
-    // Parallax scroll on host (the custom element itself scrolls)
+    // Parallax scroll
     this._onScrollBound = this._onScroll.bind(this);
     this.addEventListener("scroll", this._onScrollBound, { passive: true });
   }
@@ -90,23 +102,29 @@ class HomeScreen extends HTMLElement {
       .replace(",", "");
   }
 
+  /**
+   * OPTIMIZED: Uses cached monthly queries from state.js
+   */
   async _loadMonth(y, m) {
-    const start = new Date(y, m, 1);
-    const end = new Date(y, m + 1, 1);
+    const yearMonth = `${y}-${String(m + 1).padStart(2, "0")}`; // "2025-01"
+    this._currentYearMonth = yearMonth;
 
     try {
-      const all = await db.transactions.toArray();
-      const txs = all
-        .filter((t) => {
-          const d = new Date(t.date);
-          return d >= start && d < end;
-        })
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      this.tx = txs;
+      console.time(`📊 Load ${yearMonth}`);
+      
+      // ✅ NEW: Use optimized cached query
+      const txs = await getMonthTransactions(yearMonth);
+      
+      // Sort by date (newest first)
+      this.tx = txs.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      console.timeEnd(`📊 Load ${yearMonth}`);
+      console.log(`✅ Loaded ${this.tx.length} transactions for ${yearMonth}`);
+      
       this._groupByDate();
       this._render();
     } catch (e) {
+      console.error("Failed to load month:", e);
       this.tx = [];
       this.grouped = [];
       this._render();
@@ -284,8 +302,8 @@ class HomeScreen extends HTMLElement {
     if (!summary) return;
 
     const clamped = Math.min(y, 140);
-    const translate = clamped * 0.25; // moves down slightly
-    const scale = 1 - clamped / 1200; // 1 → ~0.88
+    const translate = clamped * 0.25;
+    const scale = 1 - clamped / 1200;
     const opacity = 1 - Math.min(clamped / 400, 0.2);
 
     summary.style.transform = `translateY(${translate}px) scale(${scale})`;
@@ -396,7 +414,7 @@ class HomeScreen extends HTMLElement {
   align-items:center;
   padding:6px 4px;
   margin-top:16px;
-  margin-bottom:2px;   /* FIXED */
+  margin-bottom:2px;
   border-bottom:1px solid rgba(255,255,255,0.06);
   font-size:13px;
 
@@ -406,7 +424,7 @@ class HomeScreen extends HTMLElement {
   backdrop-filter:blur(8px);
   background:rgba(2,6,23,0.88);
 
-  height:32px;         /* PERFECT vertical alignment */
+  height:32px;
 }
 
 .day-label{
@@ -421,7 +439,7 @@ class HomeScreen extends HTMLElement {
   font-weight:600;
   color:#FCA5A5;
   line-height:1;
-  margin-right:4px;    /* FIX: matches tx-amt alignment */
+  margin-right:4px;
   display:flex;
   align-items:center;
 }
@@ -443,12 +461,12 @@ class HomeScreen extends HTMLElement {
   display:flex;
   flex-direction:column;
   gap:6px;
-  margin-top:4px;       /* FIXED — no big gap */
+  margin-top:4px;
   margin-bottom:10px;
 }
 
 /* ============================
-   TRANSACTION ITEM (A+B UPGRADE)
+   TRANSACTION ITEM
 ============================= */
 
 .tx-item{
@@ -484,7 +502,7 @@ class HomeScreen extends HTMLElement {
   to{opacity:1;transform:translateY(0);}
 }
 
-/* Hover (soft iOS) */
+/* Hover */
 .tx-item:hover{
   background:#111C31;
   box-shadow:
@@ -498,9 +516,6 @@ class HomeScreen extends HTMLElement {
   transform:scale(.97);
   background:#0B1320;
 }
-
-/* Remove neon bar */
-.tx-item::before{ display:none !important; }
 
 /* LEFT SIDE */
 .tx-left{
@@ -560,7 +575,7 @@ class HomeScreen extends HTMLElement {
   font-weight:600;
   white-space:nowrap;
   color:#FCA5A5;
-  margin-right:4px;     /* FIX: aligns with day-total */
+  margin-right:4px;
 }
 .tx-amt.negative{
   color:#fb7185;
@@ -611,9 +626,6 @@ class HomeScreen extends HTMLElement {
   .wrap{padding:0 6px;}
 }
 </style>
-
-
-
 
       <div class="wrap">
         <div class="summary">
@@ -703,10 +715,10 @@ class HomeScreen extends HTMLElement {
           (t) => `
         <div class="tx-item" data-action="open-tx" data-id="${t.id}" tabindex="0">
           <div class="tx-left">
-            <div class="tx-emoji">${t.emoji || t.catEmoji || "🧾"}</div>
+            <div class="tx-emoji">${t.emoji || "🧾"}</div>
             <div class="tx-meta">
               <div class="tx-cat">${this._esc(t.catName || "Uncategorized")}</div>
-              ${t.subCat ? `<div class="tx-subcat">${this._esc(t.subCat)}</div>` : ""}
+              ${t.subName ? `<div class="tx-subcat">${this._esc(t.subName)}</div>` : ""}
               ${t.note ? `<div class="tx-note">${this._esc(t.note)}</div>` : ""}
             </div>
           </div>

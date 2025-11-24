@@ -11,6 +11,22 @@
   --shadow: 0 6px 24px rgba(2, 6, 23, 0.6);
 }
 
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  background: rgba(2, 6, 23, 0.85);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+
 /* safe-area for bottom nav */
 .app-tabbar {
   padding-bottom: env(safe-area-inset-bottom);
@@ -22,6 +38,24 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: #2f3a44;
   /* page background similar to screenshot — optional */
+}
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+app-header {
+  flex-shrink: 0; /* Header doesn't shrink */
+}
+
+.screen {
+  flex: 1; /* Screens take remaining space */
+  overflow-y: auto;
 }
 
 /* subtle tweak: ensure nav labels match desired weight/size */
