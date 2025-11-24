@@ -36,8 +36,8 @@ html,
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #2f3a44;
-  /* page background similar to screenshot — optional */
+  background: #020617;
+  /* Match home page background */
 }
 body {
   margin: 0;
@@ -47,29 +47,18 @@ body {
   flex-direction: column;
 }
 
-
-
 app-header {
-  flex-shrink: 0; /* Header doesn't shrink */
+  flex-shrink: 0;
 }
 
 .screen {
-  flex: 1; /* Screens take remaining space */
-  overflow-y: auto;
-}
-
-/* subtle tweak: ensure nav labels match desired weight/size */
-
-/* Prevent content from hiding behind floating tab-bar */
-.screen {
-  padding-bottom: 100px;
-  overflow-y: auto;
+  display: block;
   box-sizing: border-box;
 }
 
-/* Smooth scrolling for better UX */
-.screen {
-  scroll-behavior: smooth;
+main#screens {
+  padding-bottom: 120px;
+  background: #020617;
 }
 
 /* overlay fade */
@@ -130,11 +119,9 @@ app-header {
 }
 
 .screen {
-  height: 100%;
+  height: auto;
   width: 100%;
-  position: absolute;
-  inset: 0;
-  padding-bottom: 72px;
+  position: relative;
 }
 
 .app-fab {

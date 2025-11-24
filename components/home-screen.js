@@ -318,27 +318,26 @@ class HomeScreen extends HTMLElement {
       <style>
 /* ROOT */
 :host {
-  display:block;
-  padding:14px;
-  box-sizing:border-box;
-  background:#020617;
-  color:#E8EEFF;
-  font-family:Inter,system-ui;
-  overflow-y:auto;
-  height:100%;
-  position:relative;
+  display: block;
+  padding: 14px;
+  box-sizing: border-box;
+  background: #020617;
+  color: #E8EEFF;
+  font-family: Inter, system-ui;
+  width: 100%;
+  position: relative;
 }
 
 /* Background vignette */
-:host::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  pointer-events:none;
+:host::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   background:
-    radial-gradient(circle at 20% -10%, rgba(37,99,235,0.20), transparent 55%),
-    radial-gradient(circle at bottom, rgba(15,23,42,0.85), #020617 80%);
-  z-index:-1;
+    radial-gradient(circle at 20% -10%, rgba(37, 99, 235, 0.20), transparent 55%),
+    radial-gradient(circle at bottom, rgba(15, 23, 42, 0.85), #020617 80%);
+  z-index: -1;
 }
 
 .wrap { 

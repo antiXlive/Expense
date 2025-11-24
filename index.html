@@ -37,22 +37,16 @@
 
 <body class="dark bg-slate-900 text-slate-200 antialiased">
   <div id="app" class="min-h-screen flex flex-col">
-    <main id="screens" class="flex-1 relative overflow-hidden">
+    <app-header></app-header>
+    <main id="screens" class="flex-1 relative overflow-y-auto">
       <!-- Screens: hidden/shown by app.js -->
       <lock-screen class="screen hidden"></lock-screen>
       <pin-screen class="screen hidden"></pin-screen>
 
-
-      <app-header></app-header>
       <section id="home-screen" class="screen">
         <home-screen></home-screen>
       </section>
       <stats-screen id="stats-screen" class="screen hidden"></stats-screen>
-
-
-      <!-- <section id="stats-screen" class="screen hidden">
-        <stats-view></stats-view>
-      </section> -->
 
       <section id="settings-screen-wrap" class="screen hidden">
         <settings-screen></settings-screen>

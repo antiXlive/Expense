@@ -49,18 +49,20 @@ class AppHeader extends HTMLElement {
           top: 0;
           z-index: 1000;
           backdrop-filter: blur(12px);
-          background: rgba(2, 6, 23, 0.85);
+          background: rgba(2, 6, 23, 0.95);
           border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+          height: 62px;
         }
 
         .header {
           max-width: 980px;
           margin: 0 auto;
-          padding: 12px 16px;
+          padding: 8px 16px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           gap: 12px;
+          height: 100%;
         }
 
         /* LEFT SIDE - Logo + Name */
@@ -73,52 +75,25 @@ class AppHeader extends HTMLElement {
         }
 
         .logo {
-          width: 38px;
-          height: 38px;
+          width: 40px;
+          height: 40px;
           border-radius: 10px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 
-            0 4px 12px rgba(16, 185, 129, 0.3),
-            inset 0 -2px 4px rgba(0, 0, 0, 0.2);
-          flex-shrink: 0;
-          position: relative;
+          backdrop-filter: blur(8px);
           overflow: hidden;
+          flex-shrink: 0;
         }
 
-        .logo::before {
-          content: '';
-          position: absolute;
-          top: -50%;
-          left: -50%;
-          width: 200%;
-          height: 200%;
-          background: linear-gradient(
-            45deg,
-            transparent,
-            rgba(255, 255, 255, 0.1),
-            transparent
-          );
-          transform: rotate(45deg);
-          animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-          0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-          50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .logo-icon {
-          font-size: 20px;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        .logo-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 10px;
         }
 
         .app-name {
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 700;
-          color: #F6F8FF;
+          color: #f8fafc;
           letter-spacing: -0.02em;
           white-space: nowrap;
         }
@@ -239,35 +214,7 @@ class AppHeader extends HTMLElement {
           transition: color 0.3s ease;
         }
 
-        /* Hexagon grid pattern background (subtle) */
-        .status-chip::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-image: 
-            linear-gradient(30deg, transparent 48%, rgba(255, 255, 255, 0.02) 49%, rgba(255, 255, 255, 0.02) 51%, transparent 52%),
-            linear-gradient(150deg, transparent 48%, rgba(255, 255, 255, 0.02) 49%, rgba(255, 255, 255, 0.02) 51%, transparent 52%),
-            linear-gradient(270deg, transparent 48%, rgba(255, 255, 255, 0.02) 49%, rgba(255, 255, 255, 0.02) 51%, transparent 52%);
-          background-size: 8px 14px;
-          pointer-events: none;
-          opacity: 0.5;
-        }
-          .logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  overflow: hidden;
-  background: none;
-  box-shadow: none;
-}
 
-          .logo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;   /* Perfect fit */
-  border-radius: 10px; /* match container curve */
-}
 
 
         /* Responsive */
