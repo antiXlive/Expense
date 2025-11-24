@@ -1,4 +1,6 @@
 // components/app-header.js
+import { THEME } from "../js/theme.js";
+
 class AppHeader extends HTMLElement {
   constructor() {
     super();
@@ -44,25 +46,44 @@ class AppHeader extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host {
-          display: block;
-          position: sticky;
+          display: flex;
+          justify-content: center;
+          position: fixed;
           top: 0;
+          left: 0;
+          right: 0;
           z-index: 1000;
-          backdrop-filter: blur(12px);
-          background: rgba(2, 6, 23, 0.95);
-          border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-          height: 62px;
+          pointer-events: none;
+          padding: 0;
+          width: 100%;
         }
 
-        .header {
-          max-width: 980px;
-          margin: 0 auto;
-          padding: 8px 16px;
+        .header-pill {
+          pointer-events: auto;
+          width: calc(100% - 32px);
+          max-width: 100%;
+          padding: 8px 20px;
+          border-radius: 0;
+          height: 56px;
+          background: linear-gradient(135deg, rgba(15, 20, 40, 0.6), rgba(19, 26, 46, 0.6));
+          backdrop-filter: blur(30px) saturate(180%);
+          -webkit-backdrop-filter: blur(30px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           display: flex;
           justify-content: space-between;
           align-items: center;
           gap: 12px;
-          height: 100%;
+          box-shadow: 
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            0 8px 32px rgba(0, 0, 0, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        .header-pill:hover {
+          box-shadow: 
+            0 12px 48px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
+          transform: translateY(-2px);
         }
 
         /* LEFT SIDE - Logo + Name */
@@ -75,25 +96,26 @@ class AppHeader extends HTMLElement {
         }
 
         .logo {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
+          width: 36px;
+          height: 36px;
+          border-radius: 9px;
           backdrop-filter: blur(8px);
           overflow: hidden;
           flex-shrink: 0;
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .logo-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          border-radius: 10px;
+          border-radius: 9px;
         }
 
         .app-name {
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 700;
-          color: #f8fafc;
+          color: #e8eeff;
           letter-spacing: -0.02em;
           white-space: nowrap;
         }
@@ -104,22 +126,24 @@ class AppHeader extends HTMLElement {
           align-items: center;
           gap: 6px;
           padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 600;
+          border-radius: 16px;
+          font-size: 11px;
+          font-weight: 700;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
           flex-shrink: 0;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
 
         /* Online State */
         .status-chip.online {
-          background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
-          border: 1px solid rgba(16, 185, 129, 0.3);
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15));
+          border: 1px solid rgba(16, 185, 129, 0.4);
           box-shadow: 
-            0 0 15px rgba(16, 185, 129, 0.2),
-            inset 0 0 10px rgba(16, 185, 129, 0.05);
+            0 0 12px rgba(16, 185, 129, 0.25),
+            inset 0 0 8px rgba(16, 185, 129, 0.1);
         }
 
         .status-chip.online .status-text {
@@ -128,42 +152,21 @@ class AppHeader extends HTMLElement {
 
         /* Offline State */
         .status-chip.offline {
-          background: linear-gradient(135deg, rgba(148, 163, 184, 0.12), rgba(100, 116, 139, 0.12));
-          border: 1px solid rgba(148, 163, 184, 0.2);
+          background: linear-gradient(135deg, rgba(148, 163, 184, 0.15), rgba(100, 116, 139, 0.1));
+          border: 1px solid rgba(148, 163, 184, 0.25);
           box-shadow: 
-            0 0 10px rgba(148, 163, 184, 0.1),
-            inset 0 0 8px rgba(148, 163, 184, 0.05);
+            0 0 8px rgba(148, 163, 184, 0.15),
+            inset 0 0 6px rgba(148, 163, 184, 0.08);
         }
 
         .status-chip.offline .status-text {
-          color: #94a3b8;
-        }
-
-        /* Futuristic glow effect */
-        .status-chip::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.1),
-            transparent
-          );
-          transition: left 0.5s;
-        }
-
-        .status-chip:hover::before {
-          left: 100%;
+          color: #cbd5e1;
         }
 
         /* Status Indicator Dot */
         .status-indicator {
-          width: 8px;
-          height: 8px;
+          width: 7px;
+          height: 7px;
           border-radius: 50%;
           position: relative;
           flex-shrink: 0;
@@ -172,13 +175,13 @@ class AppHeader extends HTMLElement {
         .status-chip.online .status-indicator {
           background: #10b981;
           box-shadow: 
-            0 0 8px rgba(16, 185, 129, 0.8),
-            0 0 16px rgba(16, 185, 129, 0.4);
+            0 0 6px rgba(16, 185, 129, 0.8),
+            0 0 12px rgba(16, 185, 129, 0.5);
         }
 
         .status-chip.offline .status-indicator {
-          background: #64748b;
-          box-shadow: 0 0 4px rgba(100, 116, 139, 0.4);
+          background: #94a3b8;
+          box-shadow: 0 0 4px rgba(148, 163, 184, 0.4);
         }
 
         /* Pulse animation for online */
@@ -207,20 +210,25 @@ class AppHeader extends HTMLElement {
         }
 
         .status-text {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.03em;
-          text-transform: uppercase;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.05em;
           transition: color 0.3s ease;
         }
 
-
-
-
         /* Responsive */
         @media (max-width: 480px) {
+          .header-pill {
+            padding: 10px 16px;
+          }
+
           .app-name {
-            font-size: 15px;
+            font-size: 13px;
+          }
+
+          .logo {
+            width: 32px;
+            height: 32px;
           }
 
           .status-text {
@@ -229,16 +237,16 @@ class AppHeader extends HTMLElement {
 
           .status-chip {
             padding: 6px 8px;
-            min-width: 32px;
+            min-width: 28px;
             justify-content: center;
           }
         }
       </style>
 
-      <header class="header">
+      <header class="header-pill">
         <div class="brand">
           <div class="logo">
-            <img class="logo-img" src="../icons/icon-48.png" alt="App Logo">
+            <img class="logo-img" src="./icons/icon-48.png" alt="App Logo">
           </div>
           <span class="app-name">Expense Manager</span>
         </div>

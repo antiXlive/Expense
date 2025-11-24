@@ -21,16 +21,17 @@ const BACKUP_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 
 const SCREEN_IDS = {
   HOME: "home-screen",
+  AI: "ai-screen",
   STATS: "stats-screen",
   SETTINGS: "settings-screen-wrap"
 };
 
 const ROUTES = {
   home: SCREEN_IDS.HOME,
+  ai: SCREEN_IDS.AI,
   stats: SCREEN_IDS.STATS,
   budget: SCREEN_IDS.STATS,
-  settings: SCREEN_IDS.SETTINGS,
-  ai: null
+  settings: SCREEN_IDS.SETTINGS
 };
 
 // ======================================================
@@ -134,16 +135,6 @@ export function navigateTo(tab, opts = {}) {
   if (!ROUTES.hasOwnProperty(key)) {
     console.warn(`Unknown route "${key}", redirecting to home`);
     return navigateTo("home", opts);
-  }
-
-  // Handle AI route (special case - no screen element)
-  if (key === "ai") {
-    state.lastScreen = "ai";
-    saveSnapshot();
-    EventBus.emit("open-ai", {});
-    EventBus.emit("navigated", { to: "ai" });
-    updateURL("ai", replaceHistory);
-    return;
   }
 
   // Get screen element

@@ -321,7 +321,7 @@ class HomeScreen extends HTMLElement {
   display: block;
   padding: 14px;
   box-sizing: border-box;
-  background: #020617;
+  background: linear-gradient(135deg, #0f1425 0%, #131a2e 100%);
   color: #E8EEFF;
   font-family: Inter, system-ui;
   width: 100%;
@@ -335,8 +335,8 @@ class HomeScreen extends HTMLElement {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 20% -10%, rgba(37, 99, 235, 0.20), transparent 55%),
-    radial-gradient(circle at bottom, rgba(15, 23, 42, 0.85), #020617 80%);
+    radial-gradient(circle at 20% -10%, rgba(37, 99, 235, 0.15), transparent 55%),
+    radial-gradient(circle at bottom, rgba(15, 23, 42, 0.5), #0f1425 80%);
   z-index: -1;
 }
 
@@ -404,52 +404,55 @@ class HomeScreen extends HTMLElement {
 }
 
 /* ============================
-   DAY HEADER (FIXED GAP)
+   DAY HEADER (PARENT INDICATOR)
 ============================= */
 
-.day-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:6px 4px;
-  margin-top:16px;
-  margin-bottom:2px;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  font-size:13px;
-
-  position:sticky;
-  top:0;
-  z-index:10;
-  backdrop-filter:blur(8px);
-  background:rgba(2,6,23,0.88);
-
-  height:32px;
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 12px;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  border-bottom: 2px solid rgba(71, 85, 105, 0.4);
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: transparent;
 }
 
-.day-label{
-  font-size:13px;
-  font-weight:600;
-  color:#C8D7FF;
-  line-height:1;
+.day-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  flex: 1;
 }
 
-.day-total{
-  font-size:13px;
-  font-weight:600;
-  color:#FCA5A5;
-  line-height:1;
-  margin-right:4px;
-  display:flex;
-  align-items:center;
+.day-total {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fb7185;
+  line-height: 1;
+  margin-right: 0;
+  display: flex;
+  align-items: center;
+  text-align: right;
+  min-width: 90px;
+  justify-content: flex-end;
 }
 
 /* Today highlight */
-.day-header.today .day-label{
-  color:#A3CCFF;
-  text-shadow:0 0 8px rgba(59,130,246,0.35);
+.day-header.today {
+  border-bottom-color: rgba(59, 130, 246, 0.5);
 }
-.day-header.today{
-  border-bottom-color:rgba(96,165,250,0.35);
+
+.day-header.today .day-label {
+  color: #93c5fd;
+  font-weight: 800;
 }
 
 /* ============================
@@ -469,7 +472,7 @@ class HomeScreen extends HTMLElement {
 ============================= */
 
 .tx-item{
-  padding:8px 12px;
+  padding:10px 12px;
   border-radius:12px;
   background:#0D1525;
   border:1px solid rgba(255,255,255,0.05);
@@ -570,11 +573,14 @@ class HomeScreen extends HTMLElement {
 
 /* AMOUNT */
 .tx-amt{
-  font-size:14px;
-  font-weight:600;
+  font-size:13px;
+  font-weight:700;
   white-space:nowrap;
   color:#FCA5A5;
-  margin-right:4px;
+  margin-right:0;
+  text-align:right;
+  min-width:90px;
+  flex-shrink:0;
 }
 .tx-amt.negative{
   color:#fb7185;
