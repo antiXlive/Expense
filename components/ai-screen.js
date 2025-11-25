@@ -34,7 +34,8 @@ class AIScreen extends HTMLElement {
    MAIN BACKGROUND (40% black + glows)
    ========================================== */
 .glossy-container {
-  position: absolute;
+//   position: absolute;
+height:100vh;
   inset: 0;
   overflow: hidden;
 
