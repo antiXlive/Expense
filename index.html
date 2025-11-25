@@ -98,6 +98,15 @@
 
   <!-- Register service worker -->
   <script>
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('Install prompt available');
+      // Show install button/notification here if you have one
+    });
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', async () => {
         try {
