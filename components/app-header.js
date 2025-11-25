@@ -65,7 +65,7 @@ class AppHeader extends HTMLElement {
           padding: 8px 20px;
           border-radius: 0;
           height: 56px;
-          background: linear-gradient(135deg, rgba(15, 20, 40, 0.6), rgba(19, 26, 46, 0.6));
+          background: linear-gradient(180deg, rgba(28, 28, 30, 0.85), rgba(18, 18, 20, 0.9));
           backdrop-filter: blur(30px) saturate(180%);
           -webkit-backdrop-filter: blur(30px) saturate(180%);
           border: 1px solid rgba(255, 255, 255, 0.12);

@@ -315,322 +315,303 @@ class HomeScreen extends HTMLElement {
   // -----------------------------------------
   render() {
     this.shadowRoot.innerHTML = `
-      <style>
+    <style>
 /* ROOT */
 :host {
   display: block;
-  padding: 14px;
+  padding: 16px;
   box-sizing: border-box;
-  background: linear-gradient(135deg, #0f1425 0%, #131a2e 100%);
-  color: #E8EEFF;
-  font-family: Inter, system-ui;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   width: 100%;
   position: relative;
+  letter-spacing: -0.01em;
 }
 
-/* Background vignette */
 :host::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 20% -10%, rgba(37, 99, 235, 0.15), transparent 55%),
-    radial-gradient(circle at bottom, rgba(15, 23, 42, 0.5), #0f1425 80%);
+  background: transparent;
+  opacity: 0.12;
   z-index: -1;
 }
 
-.wrap { 
-  max-width:980px; 
-  margin:0 auto; 
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
 }
 
 /* ============================
    SUMMARY CARD
-============================= */
-.summary{
-  padding:18px 20px;
-  border-radius:20px;
-  background:linear-gradient(165deg,#091320,#0B162A);
-  border:1px solid rgba(148,163,184,0.16);
-  box-shadow:
-    0 14px 28px rgba(0,0,0,0.55),
-    inset 0 0 12px rgba(59,130,246,0.10);
-  margin-bottom:20px;
-  position:relative;
-  overflow:hidden;
+============================ */
+.summary {
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-deep);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(6px);
 }
 
-/* shimmer */
-.summary::before{
-  content:'';
-  position:absolute;
-  top:-40%; right:-40%;
-  width:120%; height:120%;
-  background:radial-gradient(circle at top right,rgba(59,130,246,0.30),transparent 65%);
-  opacity:0.7;
-  pointer-events:none;
+.summary::before {
+  content: '';
+  position: absolute;
+  top: -40%; right: -35%;
+  width: 120%; height: 120%;
+  background: radial-gradient(circle at top right, var(--tint-3), transparent 70%);
+  opacity: .35;
 }
 
-.month-name{
-  font-size:15px;
-  font-weight:600;
-  color:#A9C4FF;
+.month-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tint-2);
 }
-.total{
-  font-size:28px;
-  font-weight:700;
-  margin-top:6px;
-  color:#F6F8FF;
+
+.total {
+  font-size: 26px;
+  font-weight: 600;
+  margin-top: 6px;
+  color: var(--text-primary);
 }
-.meta{
-  margin-top:8px;
-  font-size:12px;
-  color:#90A8D4;
-  display:flex;
-  gap:6px;
-  align-items:center;
+
+.meta {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 8px;
 }
 
 /* ============================
-   SWIPE HINT
-============================= */
-.swipe-hint{
-  text-align:center;
-  font-size:11px;
-  color:#8098C6;
-  margin:6px 0 12px;
-  opacity:.75;
-}
-
-/* ============================
-   DAY HEADER (PARENT INDICATOR)
-============================= */
-
+   DAY HEADER
+============================ */
 .day-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 12px;
-  margin-top: 18px;
+
+  padding: 8px 2px;
+  margin-top: 20px;
   margin-bottom: 8px;
-  border-bottom: 2px solid rgba(71, 85, 105, 0.4);
-  font-size: 13px;
+
+  border-bottom: 1px solid var(--card-border);
+  font-size: 12px;
+  font-weight: 500;
+
   position: sticky;
   top: 0;
   z-index: 10;
-  backdrop-filter: blur(8px);
-  background: transparent;
+
+  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.18);
 }
 
 .day-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #94a3b8;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .day-total {
-  font-size: 13px;
-  font-weight: 700;
-  color: #fb7185;
-  line-height: 1;
-  margin-right: 0;
-  display: flex;
-  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tx-amt);
+  min-width: 80px;
   text-align: right;
-  min-width: 90px;
-  justify-content: flex-end;
 }
 
-/* Today highlight */
 .day-header.today {
-  border-bottom-color: rgba(59, 130, 246, 0.5);
+  border-bottom-color: var(--tint-2);
+  background: rgba(0,60,70,0.2);
 }
 
 .day-header.today .day-label {
-  color: #93c5fd;
-  font-weight: 800;
+  color: var(--tint-1);
 }
 
 /* ============================
    TRANSACTION LIST
-============================= */
-
-.tx-list{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  margin-top:4px;
-  margin-bottom:10px;
+============================ */
+.tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
 }
 
 /* ============================
-   TRANSACTION ITEM
-============================= */
+   TRANSACTION CARD (minimal)
+============================ */
+.tx-item {
+  padding: 10px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
 
-.tx-item{
-  padding:10px 12px;
-  border-radius:12px;
-  background:#0D1525;
-  border:1px solid rgba(255,255,255,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
+  margin: 0; /* full width */
 
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.40),
-    0 6px 12px rgba(0,0,0,0.30);
+  font-size: 13px;
+  font-weight: 400;
 
-  position:relative;
-
-  opacity:0;
-  transform:translateY(7px);
-  animation:txIn .28s ease forwards;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: txIn .22s ease forwards;
 
   transition:
-    background .18s ease,
-    box-shadow .18s ease,
-    transform .14s ease;
+    transform .12s ease,
+    background .15s ease,
+    box-shadow .15s ease;
 }
 
-/* Entry animation */
-@keyframes txIn{
-  from{opacity:0;transform:translateY(8px);}
-  to{opacity:1;transform:translateY(0);}
+@keyframes txIn {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Hover */
-.tx-item:hover{
-  background:#111C31;
-  box-shadow:
-    0 4px 8px rgba(0,0,0,0.55),
-    0 10px 20px rgba(0,0,0,0.40);
-  transform:translateY(-1px);
+.tx-item:hover {
+  transform: translateY(-1px);
 }
 
-/* Press */
-.tx-item:active{
-  transform:scale(.97);
-  background:#0B1320;
+.tx-item:active {
+  transform: scale(0.985);
 }
 
-/* LEFT SIDE */
-.tx-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  min-width:0;
-  flex:1;
+/* ============================
+   LEFT SIDE
+============================ */
+.tx-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
 }
 
-/* Emoji badge */
-.tx-emoji{
-  width:24px;
-  height:24px;
-  border-radius:7px;
-  background:rgba(59,130,246,0.16);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:14px;
-  color:#dce8ff;
-  flex-shrink:0;
+/* ============================
+   EMOJI BUBBLE (Revolut-style)
+============================ */
+.tx-emoji {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%; /* circular */
+  background: rgba(255,255,255,0.10); 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  font-weight: 400;
 }
 
-/* TEXT META */
-.tx-meta{
-  display:flex;
-  flex-direction:column;
-  gap:1px;
-  min-width:0;
+/* ============================
+   META TEXT
+============================ */
+.tx-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 
-.tx-cat{
-  font-size:13px;
-  font-weight:600;
-  color:#EDF3FF;
+.tx-cat {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-.tx-subcat{
-  font-size:11px;
-  font-weight:500;
-  color:#A5B9D9;
+.tx-subcat {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-secondary);
 }
 
-.tx-note{
-  font-size:10px;
-  color:#9CAAC7;
-  opacity:.8;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+.tx-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* AMOUNT */
-.tx-amt{
-  font-size:13px;
-  font-weight:700;
-  white-space:nowrap;
-  color:#FCA5A5;
-  margin-right:0;
-  text-align:right;
-  min-width:90px;
-  flex-shrink:0;
-}
-.tx-amt.negative{
-  color:#fb7185;
+/* ============================
+   AMOUNT
+============================ */
+.tx-amt {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+  color: var(--tx-amt);
 }
 
-/* Long press */
-.tx-item.pressing{
-  background:#2a1c22;
-  border-color:rgba(255,90,90,0.5);
-  box-shadow:0 0 10px rgba(255,70,70,0.25);
+.tx-amt.negative {
+  color: #ff4d67 !important; /* expense red */
 }
 
-/* Ripple */
-.ripple{
-  position:absolute;
-  width:10px;height:10px;
-  border-radius:50%;
-  background:rgba(150,200,255,0.40);
-  transform:scale(0);
-  animation:cleanRipple .45s ease-out forwards;
-}
-@keyframes cleanRipple{
-  to{transform:scale(9);opacity:0;}
-}
-
-/* EMPTY STATE */
-.empty{
-  padding:40px;
-  text-align:center;
-  color:#879BC7;
-}
-.empty-icon{
-  font-size:44px;
-  opacity:.4;
-  margin-bottom:12px;
-}
-.empty-title{
-  font-size:15px;
-  font-weight:600;
-  margin-bottom:4px;
-}
-.empty-subtitle{
-  font-size:12px;
-  color:#9CA3AF;
+/* ============================
+   RIPPLE
+============================ */
+.ripple {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  transform: scale(0);
+  animation: cleanRipple .45s ease-out forwards;
 }
 
-@media(min-width:880px){
-  .wrap{padding:0 6px;}
+@keyframes cleanRipple {
+  to { transform: scale(9); opacity: 0; }
+}
+
+/* ============================
+   EMPTY STATE
+============================ */
+.empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  font-size: 42px;
+  opacity: .4;
+  margin-bottom: 14px;
+}
+
+.empty-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.empty-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@media (min-width: 880px) {
+  .wrap { padding: 0 8px; }
 }
 </style>
+
+
+
+
 
       <div class="wrap">
         <div class="summary">

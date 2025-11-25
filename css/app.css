@@ -2,25 +2,17 @@
 @import url('./theme-variables.css');
 
 :root {
-  --accent: #3b82f6;
-  --bg: #0f172a;
-  --card: #111827;
-  --muted: #94a3b8;
-  --glass: rgba(255, 255, 255, 0.03);
-  --radius: 14px;
-  --shadow: 0 6px 24px rgba(2, 6, 23, 0.6);
+  --accent: #007AFF;
+  --bg: #000000;
+  --card: #1C1C1E;
+  --muted: #A1A1A6;
+  --glass: rgba(255, 255, 255, 0.05);
+  --radius: 12px;
+  --shadow: 0 10px 20px rgba(0, 0, 0, 0.20);
   --anim-ease: cubic-bezier(.2, .9, .2, 1);
 }
 
-:host {
-  display: block;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(12px);
-  background: rgba(2, 6, 23, 0.85);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-}
+/* Removed general :host rule - each component has its own styling */
 
 html, body {
   margin: 0;
@@ -45,8 +37,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%);
-  background-attachment: fixed;
+  background: transparent;
 }
 
 body::before {
@@ -56,7 +47,7 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%);
+  background: transparent;
   pointer-events: none;
   z-index: -1;
 }
@@ -71,8 +62,8 @@ app-header {
 }
 
 main#screens {
+  background: transparent;
   padding-bottom: 120px;
-  background: linear-gradient(180deg, #0a0e27 0%, #0f1425 50%, #131a2e 100%);
 }
 
 /* overlay fade */

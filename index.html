@@ -15,21 +15,22 @@
   <link rel="manifest" href="./pwa/manifest.json" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="stylesheet" href="./css/theme-variables.css">
+  <link rel="stylesheet" href="./css/theme.css">
+
   <style>
     /* Global background to prevent white edges on over-scroll */
     html {
-      background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%);
-      background-attachment: fixed;
+      
       margin: 0;
       padding: 0;
     }
 
     /* Default safe-area and full app sizing */
     :root {
-      --accent: #3b82f6;
-      --bg: #0f172a;
-      --card: #111827;
-      --muted: #94a3b8;
+      --accent: #007AFF;
+      --bg: #000000;
+      --card: #1C1C1E;
+      --muted: #A1A1A6;
       --anim-ease: cubic-bezier(.2, .9, .2, 1);
     }
 
@@ -45,9 +46,9 @@
   <link rel="stylesheet" href="./css/app.css">
 </head>
 
-<body class="dark text-slate-200 antialiased" style="background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%); background-attachment: fixed; margin: 0; padding: 0;">
+<body class="dark text-slate-200 antialiased" style="background: #000000; background-attachment: fixed; margin: 0; padding: 0;">
   <div id="app" class="min-h-screen flex flex-col" style="background: transparent;">
-    <app-header></app-header>
+    <!-- <app-header></app-header> -->
     <main id="screens" class="flex-1 relative overflow-y-auto" style="margin-top: 70px;">
       <!-- Screens: hidden/shown by app.js -->
       <lock-screen class="screen hidden"></lock-screen>

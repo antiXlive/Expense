@@ -1,41 +1,41 @@
-/* Centralized Theme Variables */
+/* Centralized Theme Variables - Dark iOS Design */
 :root {
-  /* Colors - Primary */
-  --color-primary: #2563eb;
-  --color-secondary: #06b6d4;
-  --color-accent: #2dd4bf;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-destructive: #fb7185;
+  /* Colors - Primary (iOS Blue) */
+  --color-primary: #007AFF;
+  --color-secondary: #5AC8FA;
+  --color-accent: #34C759;
+  --color-success: #34C759;
+  --color-warning: #FF9500;
+  --color-error: #FF3B30;
+  --color-destructive: #FF453A;
 
-  /* Colors - Backgrounds */
-  --color-bg-base: #0a0e27;
-  --color-bg-secondary: #0f1425;
-  --color-bg-tertiary: #131a2e;
-  --color-bg-card: #0D1525;
-  --color-bg-header: rgba(10, 14, 39, 0.95);
-  --color-bg-overlay: rgba(2, 6, 23, 0.6);
-  --color-bg-glass: rgba(2, 6, 23, 0.88);
+  /* Colors - Backgrounds (iOS Dark Mode) */
+  --color-bg-base: #000000;
+  --color-bg-secondary: #1C1C1E;
+  --color-bg-tertiary: #2C2C2E;
+  --color-bg-card: #2C2C2E;
+  --color-bg-header: rgba(0, 0, 0, 0.8);
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-glass: rgba(28, 28, 30, 0.8);
 
-  /* Colors - Text */
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-text-muted: #94a3b8;
-  --color-text-light: #e8eeff;
-  --color-text-faint: #475569;
+  /* Colors - Text (iOS Text Colors) */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #EBEBF5;
+  --color-text-muted: #A1A1A6;
+  --color-text-light: #F2F2F7;
+  --color-text-faint: #545458;
 
-  /* Colors - Borders */
-  --color-border-subtle: rgba(255, 255, 255, 0.05);
-  --color-border-light: rgba(148, 163, 184, 0.1);
-  --color-border-medium: rgba(71, 85, 105, 0.4);
-  --color-border-strong: rgba(59, 130, 246, 0.3);
+  /* Colors - Borders (iOS Separator) */
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.1);
+  --color-border-medium: rgba(255, 255, 255, 0.15);
+  --color-border-strong: rgba(0, 122, 255, 0.3);
 
   /* Colors - Status */
-  --color-status-online: #10b981;
-  --color-status-offline: #64748b;
-  --color-status-positive: #10b981;
-  --color-status-negative: #fb7185;
+  --color-status-online: #34C759;
+  --color-status-offline: #545458;
+  --color-status-positive: #34C759;
+  --color-status-negative: #FF3B30;
 
   /* Typography - Sizes */
   --font-size-xs: 11px;
@@ -56,7 +56,7 @@
   --font-weight-extrabold: 800;
 
   /* Typography - Font Family */
-  --font-family: Inter, system-ui, -apple-system, sans-serif;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -67,18 +67,18 @@
   --spacing-2xl: 24px;
   --spacing-3xl: 32px;
 
-  /* Border Radius */
+  /* Border Radius (iOS Rounded) */
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 999px;
 
-  /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.40);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 6px 24px rgba(2, 6, 23, 0.6);
-  --shadow-xl: 0 18px 46px rgba(0, 0, 0, 0.45);
+  /* Shadows (iOS Subtle Shadows) */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.20);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.25);
 
   /* Transitions */
   --transition-fast: 140ms;

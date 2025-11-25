@@ -1,0 +1,37 @@
+:root {
+  /* MAIN BACKGROUND */
+  --bg-gradient: linear-gradient(315deg, #2d3436 0%, #000000 74%);
+
+  /* ACCENT GRADIENT */
+  --accent-gradient: linear-gradient(45deg, #2563eb, #06b6d4, #2dd4bf);
+
+  /* CARD */
+  --card-bg: rgba(255,255,255,0.03);
+  --card-border: rgba(255,255,255,0.06);
+
+  /* TEXT */
+  --text-primary: #ffffff;
+  --text-secondary: #bcd0db;
+  --text-muted: #9CA3AF;
+  --tx-amt:#f51a1a;
+
+  /* TEAL–BLUE COLOR MOOD */
+  --tint-1: #5EEAD4;
+  --tint-2: #2dd4bf;
+  --tint-3: #06b6d4;
+  --tint-4: #2563eb;
+
+  /* GLOWS */
+  --glow-accent: rgba(37, 99, 235, 0.20);
+  --glow-soft: rgba(255, 255, 255, 0.08);
+
+  /* RADIUS */
+  --radius: 20px;
+
+  /* SHADOW */
+  --shadow-deep: 0 20px 40px rgba(0,0,0,0.5);
+  --shadow-soft: 0 8px 20px rgba(0,0,0,0.25);
+
+  /* GLASS */
+  --glass: rgba(255,255,255,0.06);
+}
