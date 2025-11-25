@@ -37,15 +37,28 @@ html,
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%);
   font-family: var(--font-family);
-}
-body {
   margin: 0;
   padding: 0;
-  height: 100vh;
+}
+body {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 app-header {

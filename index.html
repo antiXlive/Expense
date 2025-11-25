@@ -16,6 +16,14 @@
   <meta name="theme-color" content="#0f172a" />
   <link rel="stylesheet" href="./css/theme-variables.css">
   <style>
+    /* Global background to prevent white edges on over-scroll */
+    html {
+      background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%);
+      background-attachment: fixed;
+      margin: 0;
+      padding: 0;
+    }
+
     /* Default safe-area and full app sizing */
     :root {
       --accent: #3b82f6;
@@ -25,10 +33,11 @@
       --anim-ease: cubic-bezier(.2, .9, .2, 1);
     }
 
-    html,
     body,
     #app {
       height: 100%;
+      margin: 0;
+      padding: 0;
     }
   </style>
 
@@ -36,10 +45,10 @@
   <link rel="stylesheet" href="./css/app.css">
 </head>
 
-<body class="dark bg-slate-900 text-slate-200 antialiased">
-  <div id="app" class="min-h-screen flex flex-col">
+<body class="dark text-slate-200 antialiased" style="background: linear-gradient(135deg, #0a0e27 0%, #0f1425 50%, #0a0e27 100%); background-attachment: fixed; margin: 0; padding: 0;">
+  <div id="app" class="min-h-screen flex flex-col" style="background: transparent;">
     <app-header></app-header>
-    <main id="screens" class="flex-1 relative overflow-y-auto">
+    <main id="screens" class="flex-1 relative overflow-y-auto" style="margin-top: 70px;">
       <!-- Screens: hidden/shown by app.js -->
       <lock-screen class="screen hidden"></lock-screen>
       <pin-screen class="screen hidden"></pin-screen>
