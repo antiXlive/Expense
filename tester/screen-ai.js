@@ -3,24 +3,13 @@ window.screenLayouts = window.screenLayouts || {};
 screenLayouts.ai = function () {
 
     // ==========================
-    // THEMES for AI screen
+    // JUST THE IMAGE ARRAY
     // ==========================
-    const themes = [
-        {
-            name: "Fintech Dark Blue",
-            bg: "#0F172A",
-            text: "#FFFFFF"
-        },
-        {
-            name: "iOS Bank Dark",
-            bg: "#000000",
-            text: "#FFFFFF"
-        },
-        {
-            name: "Ocean Night",
-            bg: "#041014",
-            text: "#E6FAFF"
-        }
+    const aiImages = [
+        "ai.jpg",
+        "ai1.png",
+        "ai2.jpg",
+        // add more images here
     ];
 
     // ==========================
@@ -28,7 +17,6 @@ screenLayouts.ai = function () {
     // ==========================
     const aiStyles = `
         <style>
-            /* Root AI container fits the full mobile-content */
             .ai-screen {
                 height: 100%;
                 width: 100%;
@@ -36,28 +24,23 @@ screenLayouts.ai = function () {
                 overflow: hidden;
             }
 
-            /* Background gradient image */
             .ai-bg {
                 position: absolute;
                 inset: 0;
-                background-image: url('./ai.jpg'); /* YOUR FILE */
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
                 z-index: 1;
             }
 
-            /* Glass glossy overlay */
             .ai-glass {
                 position: absolute;
                 inset: 0;
-                background: rgba(255, 255, 255, 0.10);
-                backdrop-filter: blur(28px) saturate(180%);
-                -webkit-backdrop-filter: blur(28px) saturate(180%);
+                -webkit-backdrop-filter: blur(60px) saturate(160%);
+                backdrop-filter: blur(30px) saturate(160%);
                 z-index: 2;
             }
 
-            /* AI content area */
             .ai-content {
                 position: absolute;
                 inset: 0;
@@ -66,17 +49,15 @@ screenLayouts.ai = function () {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                text-align: center;
                 font-size: 22px;
-                font-weight: 500;
                 color: white;
+                font-weight: 500;
+                text-align: center;
             }
 
-            /* MOBILE MODE — full viewport AI */
+            /* Mobile Fullscreen Mode */
             @media (max-width: 600px) {
-                .ai-screen {
-                    border-radius: 0 !important;
-                }
+                .ai-screen,
                 .ai-bg,
                 .ai-glass {
                     border-radius: 0 !important;
@@ -86,19 +67,22 @@ screenLayouts.ai = function () {
     `;
 
     // ==========================
-    // Build one phone preview
+    // Build one phone per image
     // ==========================
-    function buildPhone(theme) {
+    function buildPhone(image) {
         return `
         <div class="theme-block">
-            <div class="theme-name">${theme.name}</div>
+            <div class="theme-name">${image}</div>
 
-            <div class="mobile-frame" style="background:${theme.bg}">
-                <div class="mobile-content" style="background:${theme.bg}; color:${theme.text}">
+            <div class="mobile-frame">
+                <div class="mobile-content">
 
                     <div class="ai-screen">
-                        <div class="ai-bg"></div>
+                        <div class="ai-bg" style="background-image:url('./${image}')"></div>
+
+                        <!-- enable/disable glass -->
                         <div class="ai-glass"></div>
+
                         <div class="ai-content">
                             AI Screen Coming Soon...
                         </div>
@@ -109,5 +93,11 @@ screenLayouts.ai = function () {
         </div>`;
     }
 
-    return aiStyles + themes.map(t => buildPhone(t)).join("");
+    // ==========================
+    // LOOP ONLY ON IMAGES
+    // ==========================
+    let html = aiStyles;
+    aiImages.forEach(img => html += buildPhone(img));
+
+    return html;
 };
