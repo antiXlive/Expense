@@ -39,24 +39,7 @@ screenLayouts.home = function () {
     ];
 
     // -----------------------------------
-    // HOME DATA (INSULATED)
-    // -----------------------------------
-    const data = {
-        today: [
-            { icon: "☕", category: "Food", sub: "Starbucks Coffee", amt: 5.50 },
-            { icon: "🚗", category: "Transport", sub: "Uber Ride", amt: 12.00 }
-        ],
-        yesterday: [
-            { icon: "🛍️", category: "Shopping", sub: "Amazon Order", amt: 45.99 },
-            { icon: "🛒", category: "Groceries", sub: "Daily Mart", amt: 78.42 }
-        ],
-        date1: [
-            { icon: "🍽️", category: "Dining", sub: "BBQ Nation", amt: 124.50 }
-        ]
-    };
-
-    // -----------------------------------
-    // HOME SCREEN CSS  (INSIDE SCREEN FILE ONLY)
+    // HOME SCREEN CSS
     // -----------------------------------
     const homeStyles = `
         <style>
@@ -81,29 +64,29 @@ screenLayouts.home = function () {
             .transaction {
                 display: flex;
                 align-items: center;
-                padding: 10px 12px;
+                padding: 12px 14px;
                 border-radius: 16px;
-                margin-bottom: 10px;
+                margin-bottom: 12px;
             }
 
             .transaction-icon {
-                width: 34px;
-                height: 34px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 18px;
+                font-size: 20px;
             }
 
             .transaction-info {
                 flex: 1;
-                padding-left: 10px;
+                padding-left: 12px;
             }
 
             .transaction-name {
                 font-size: 14px;
-                font-weight: 500;
+                font-weight: 600;
             }
 
             .transaction-category {
@@ -112,13 +95,30 @@ screenLayouts.home = function () {
             }
 
             .transaction-amount {
-                font-size: 14px;
-                font-weight: 600;
+                font-size: 15px;
+                font-weight: 700;
                 min-width: 60px;
                 text-align: right;
             }
         </style>
     `;
+
+    // -----------------------------------
+    // HOME DATA (INSULATED)
+    // -----------------------------------
+    const data = {
+        today: [
+            { icon: "☕", category: "Food", sub: "Starbucks Coffee", amt: 5.50 },
+            { icon: "🚗", category: "Transport", sub: "Uber Ride", amt: 12.00 }
+        ],
+        yesterday: [
+            { icon: "🛍️", category: "Shopping", sub: "Amazon Order", amt: 45.99 },
+            { icon: "🛒", category: "Groceries", sub: "Daily Mart", amt: 78.42 }
+        ],
+        date1: [
+            { icon: "🍽️", category: "Dining", sub: "BBQ Nation", amt: 124.50 }
+        ]
+    };
 
     // Render each day group
     function renderDay(label, list, theme) {
@@ -156,9 +156,9 @@ screenLayouts.home = function () {
         <div class="theme-block">
             <div class="theme-name">${theme.name}</div>
 
-            <div class="mobile-frame">
-                <div class="mobile-content" style="background:${theme.bg}; color:${theme.text}">
-                    
+            <div class="mobile-frame" style="background:${theme.bg}">
+                <div class="mobile-content">
+
                     <div class="home-screen">
                         ${renderDay("Today", data.today, theme)}
                         ${renderDay("Yesterday", data.yesterday, theme)}

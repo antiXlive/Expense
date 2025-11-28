@@ -28,12 +28,12 @@ screenLayouts.ai = function () {
     // ==========================
     const aiStyles = `
         <style>
+            /* Root AI container fits the full mobile-content */
             .ai-screen {
                 height: 100%;
                 width: 100%;
                 position: relative;
                 overflow: hidden;
-                border-radius: 32px;
             }
 
             /* Background gradient image */
@@ -47,28 +47,40 @@ screenLayouts.ai = function () {
                 z-index: 1;
             }
 
-            /* Glass / glossy overlay */
+            /* Glass glossy overlay */
             .ai-glass {
                 position: absolute;
                 inset: 0;
-                background: rgba(255, 255, 255, 0.08);
-                backdrop-filter: blur(38px) saturate(180%);
-                -webkit-backdrop-filter: blur(18px) saturate(180%);
+                background: rgba(255, 255, 255, 0.10);
+                backdrop-filter: blur(28px) saturate(180%);
+                -webkit-backdrop-filter: blur(28px) saturate(180%);
                 z-index: 2;
             }
 
-            /* AI content placeholder */
+            /* AI content area */
             .ai-content {
                 position: absolute;
                 inset: 0;
                 z-index: 3;
+                padding: 22px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                text-align: center;
+                font-size: 22px;
+                font-weight: 500;
                 color: white;
-                padding: 20px;
-                font-size: 20px;
-                opacity: 0.9;
+            }
+
+            /* MOBILE MODE — full viewport AI */
+            @media (max-width: 600px) {
+                .ai-screen {
+                    border-radius: 0 !important;
+                }
+                .ai-bg,
+                .ai-glass {
+                    border-radius: 0 !important;
+                }
             }
         </style>
     `;
@@ -81,7 +93,7 @@ screenLayouts.ai = function () {
         <div class="theme-block">
             <div class="theme-name">${theme.name}</div>
 
-            <div class="mobile-frame">
+            <div class="mobile-frame" style="background:${theme.bg}">
                 <div class="mobile-content" style="background:${theme.bg}; color:${theme.text}">
 
                     <div class="ai-screen">
