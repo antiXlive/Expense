@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense App Theme Preview</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+
+    <!-- TOP TABS -->
+    <div class="top-tabs">
+        <div class="tab active" data-screen="home">Home</div>
+        <div class="tab" data-screen="ai">AI</div>
+        <div class="tab" data-screen="stats">Stats</div>
+        <div class="tab" data-screen="settings">Settings</div>
+    </div>
+
+    <!-- SCREEN CONTENT AREA -->
+    <div id="themesContainer" class="themes-wrapper"></div>
+
+
+    <!-- SCREEN FILES -->
+    <script src="./screen-home.js"></script>
+    <script src="./screen-ai.js"></script>
+    <script src="./screen-stats.js"></script>
+    <script src="./screen-settings.js"></script>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        const container = document.getElementById("themesContainer");
+        let activeScreen = "home";
+
+        function renderScreen() {
+            container.innerHTML = screenLayouts[activeScreen]();
+        }
+
+        document.querySelectorAll(".tab").forEach(tab => {
+            tab.addEventListener("click", () => {
+                document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                activeScreen = tab.dataset.screen;
+                renderScreen();
+            });
+        });
+
+        renderScreen();
+    </script>
+
+</body>
+</html>

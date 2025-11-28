@@ -19,8 +19,7 @@ class AIScreen extends HTMLElement {
   render() {
   this.shadowRoot.innerHTML = `
     <style>
-
-   :host {
+:host {
   display: block;
   width: 100%;
   height: 100%;
@@ -30,56 +29,48 @@ class AIScreen extends HTMLElement {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
 }
 
-/* ==========================================
-   MAIN BACKGROUND (40% black + glows)
-   ========================================== */
+/* MAIN BACKGROUND (glows + black) */
 .glossy-container {
-//   position: absolute;
-height:100vh;
+  position: absolute;
   inset: 0;
   overflow: hidden;
 
   background:
-    /* Aqua glow */
-    radial-gradient(circle at 25% 35%, rgba(38, 208, 206, 0.55), transparent 65%),
+    /* subtle bloom mixture for depth */
+    radial-gradient(circle at 70% 40%, rgba(140, 60, 200, 0.28), transparent 65%),
+    radial-gradient(circle at 20% 25%, rgba(82, 229, 231, 0.35), transparent 55%),
 
-    /* Deep blue glow */
-    radial-gradient(circle at 80% 80%, rgba(26, 41, 128, 0.45), transparent 65%),
+    /* YOUR NEW MAIN GRADIENT */
+    linear-gradient(135deg, #52E5E7 10%, #130CB7 100%),
 
-    /* Purple tint */
-    radial-gradient(circle at 70% 55%, rgba(140, 60, 200, 0.45), transparent 70%),
-
-    /* Base black */
-    linear-gradient(180deg, #000 0%, #020202 40%, #050506 60%, #000 100%);
+    /* BLACK DEPTH BASE */
+    linear-gradient(180deg, #000 0%, #020202 35%, #050506 60%, #000 100%);
 }
 
+
 /* ==========================================
-   SUPER STRONG TOP BLACK LAYER  
-   (This is the key change)
+   TOP GLASS OVERLAY (Perfect glossy dark top)
    ========================================== */
-.top-black-fade {
+.top-glass {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 220px; /* increased height */
+  height: 165px;
 
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.95) 0%,    /* ALMOST PURE BLACK */
-    rgba(0, 0, 0, 0.92) 20%,
-    rgba(0, 0, 0, 0.85) 45%,
-    rgba(0, 0, 0, 0.70) 70%,
-    rgba(0, 0, 0, 0.00) 100%
-  );
+  background: rgba(0, 0, 0, 0.55);        /* Dark but transparent */
+  border-radius: 0 0 25px 25px;           /* Rounded bottom like iOS cards */
 
-  z-index: 5;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+
+  backdrop-filter: blur(9px) saturate(180%);
+  -webkit-backdrop-filter: blur(9px) saturate(180%);
+
   pointer-events: none;
+  z-index: 10;
 }
 
-/* ==========================================
-   VERY LIGHT GLOBAL BLUR (for shine)
-   ========================================== */
+/* LIGHT overall glass */
 .gloss-layer {
   position: absolute;
   inset: 0;
@@ -88,26 +79,18 @@ height:100vh;
   backdrop-filter: blur(6px) saturate(180%) brightness(1.18);
   -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.18);
 
-  opacity: 0.35;
+  opacity: 0.30;
   z-index: 2;
 }
 
-/* ==========================================
-   BLOOM HIGHLIGHTS
-   ========================================== */
+/* BLOOMS */
 .bloom-1 {
   position: absolute;
   width: 220px;
   height: 220px;
-  top: 80px; /* moved DOWN so it doesn't bleed into top */
+  top: 80px;
   left: -40px;
-
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.22),
-    transparent 70%
-  );
-
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 70%);
   filter: blur(55px);
   opacity: 0.25;
   z-index: 1;
@@ -117,50 +100,41 @@ height:100vh;
   position: absolute;
   width: 340px;
   height: 340px;
-  top: 25%; /* moved lower */
+  top: 28%;
   left: 50%;
   transform: translateX(-50%);
-
-  background: radial-gradient(
-    circle,
-    rgba(38, 208, 206, 0.35),
-    transparent 75%
-  );
-
+  background: radial-gradient(circle, rgba(38, 208, 206, 0.35), transparent 75%);
   filter: blur(75px);
   opacity: 0.28;
   z-index: 1;
 }
 
-/* ==========================================
-   GLOSS STREAK
-   ========================================== */
+/* GLOSS STREAK */
 .gloss-streak {
   position: absolute;
   inset: 0;
   pointer-events: none;
-
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0) 25%
-  );
-
+  background: linear-gradient(120deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 25%);
   opacity: 0.35;
-  z-index: 4;
+  z-index: 5;
 }
+
 
 
     </style>
 
     <div class="glossy-container">
-      <div class="gloss-layer"></div>
+  <div class="gloss-layer"></div>
 
-      <div class="bloom-1"></div>
-      <div class="bloom-2"></div>
+  <div class="bloom-1"></div>
+  <div class="bloom-2"></div>
 
-      <div class="gloss-streak"></div>
-    </div>
+  <div class="gloss-streak"></div>
+
+  <!-- PERFECT DARK GLOSS TOP OVERLAY -->
+  <div class="top-glass"></div>
+</div>
+
   `;
 }
 
