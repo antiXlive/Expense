@@ -9,7 +9,7 @@ screenLayouts.ai = function () {
         "ai.jpg",
         "ai1.png",
         "ai2.jpg",
-        // add more images here
+        "ai3.png",
     ];
 
     // ==========================
@@ -80,11 +80,10 @@ screenLayouts.ai = function () {
                     <div class="ai-screen">
                         <div class="ai-bg" style="background-image:url('./${image}')"></div>
 
-                        <!-- enable/disable glass -->
                         <div class="ai-glass"></div>
 
                         <div class="ai-content">
-                            AI Screen Coming Soon...
+                           
                         </div>
                     </div>
 

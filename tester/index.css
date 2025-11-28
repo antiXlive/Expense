@@ -55,7 +55,6 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     gap: 40px;
-    background: #1e293b;
 }
 
 .themes-wrapper::-webkit-scrollbar {
@@ -79,10 +78,10 @@ body {
 /* ========================================= */
 
 .mobile-frame {
-    width: 330px;
-    height: 700px;
+    width: 350px;
+    height: 750px;
     background: inherit;
-    border-radius: 40px;
+    border-radius: 25px;
     position: relative;
     overflow: hidden;
     box-shadow:
