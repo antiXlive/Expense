@@ -1,0 +1,316 @@
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    padding: 18px;
+    padding-bottom: 110px;
+    box-sizing: border-box;
+    position: relative;
+
+    background:
+        radial-gradient(circle at 20% 0%, rgba(150, 76, 255, 0.40), transparent 60%),
+        radial-gradient(circle at 85% 30%, rgba(0, 230, 255, 0.32), transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(40, 80, 255, 0.25), transparent 70%),
+        linear-gradient(135deg, #0d0b1c, #0a0f1d 50%, #06121e);
+    background-blend-mode: screen, lighten, normal;
+
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro", Inter, system-ui;
+}
+
+:host::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 30% -10%, rgba(150, 76, 255, 0.22), transparent 55%),
+        radial-gradient(circle at 90% 110%, rgba(0, 219, 255, 0.22), transparent 65%),
+        radial-gradient(circle at center, rgba(0, 0, 0, 0.45), transparent 70%);
+    filter: blur(20px);
+}
+
+/* Glossy container */
+.glossy-container {
+    position: relative;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.glossy-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 32px;
+    background: radial-gradient(circle at 70% -20%, rgba(255, 255, 255, 0.25), transparent 60%);
+    pointer-events: none;
+}
+
+.content-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+/* Month selector */
+.month-selector {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 20px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.month-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.swipe-hint {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.60);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+/* Summary card */
+.summary-card {
+    padding: 28px 24px;
+    margin-bottom: 32px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.summary-content {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.summary-stat {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Section titles */
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.section-subtitle {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.60);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Heatmap section */
+.heatmap-section {
+    margin-bottom: 32px;
+}
+
+.heatmap-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.heatmap-item {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    animation: fadeUp 0.4s ease forwards;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.heatmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.cat-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.cat-count {
+    background: rgba(100, 100, 255, 0.15);
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #4a4a8a;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.heatmap-bar-wrapper {
+    height: 24px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.heatmap-bar {
+    height: 100%;
+    border-radius: 12px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 16px currentColor;
+}
+
+.heatmap-stats {
+    font-size: 12px;
+    color: #2a2a4a;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+}
+
+/* Insights section */
+.insights-section {
+    margin-top: 32px;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+}
+
+.insight-card {
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.insight-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.insight-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.insight-title {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(40, 40, 70, 0.75);
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.insight-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+}
+
+.insight-detail {
+    font-size: 12px;
+    color: rgba(40, 40, 70, 0.65);
+    font-weight: 600;
+}
+
+/* Empty state */
+.empty-state {
+    padding: 50px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.empty-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.empty-text {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .glossy-container {
+        padding: 20px;
+        border-radius: 24px;
+    }
+
+    .summary-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .month-name {
+        font-size: 20px;
+    }
+}

@@ -1,143 +1,306 @@
-// components/ai-screen.js - Improved Glossy Blur Version
+// components/ai-screen.js - iOS Glossy AI Screen with Category Heatmap
 import { EventBus } from "../js/event-bus.js";
 import { getMonthTransactions } from "../js/state.js";
 
 class AIScreen extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: "open" });
+    constructor() {
+        super();
+        this.attachShadow({ mode: "open" });
 
-    this.current = new Date();
-    this.tx = [];
-    this.categoryData = {};
-    this._touch = { x: 0, y: 0, start: 0 };
-    this._isAnimating = false;
+        this.current = new Date();
+        this.tx = [];
+        this.categoryData = {};
+        this._touch = { x: 0, y: 0, start: 0 };
+        this._isAnimating = false;
 
-    this.render();
-  }
+        this.render();
+    }
 
-  render() {
-  this.shadowRoot.innerHTML = `
-    <style>
-:host {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-}
+    async render() {
+        // Load external CSS once and reuse for all instances
+        if (!AIScreen.sharedCSS) {
+            const cssText = await fetch("/components/ai-screen.css").then(r => r.text());
+            const sheet = new CSSStyleSheet();
+            sheet.replaceSync(cssText);
+            AIScreen.sharedCSS = sheet;
+        }
 
-/* MAIN BACKGROUND (glows + black) */
-.glossy-container {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
+        this.shadowRoot.adoptedStyleSheets = [AIScreen.sharedCSS];
 
-  background:
-    /* subtle bloom mixture for depth */
-    radial-gradient(circle at 70% 40%, rgba(140, 60, 200, 0.28), transparent 65%),
-    radial-gradient(circle at 20% 25%, rgba(82, 229, 231, 0.35), transparent 55%),
+        this.shadowRoot.innerHTML = `
+            <div class="glossy-container">
+                <div class="content-wrapper">
+                    <div id="aiContent"></div>
+                </div>
+            </div>
+        `;
+    }
 
-    /* YOUR NEW MAIN GRADIENT */
-    linear-gradient(135deg, #52E5E7 10%, #130CB7 100%),
+    connectedCallback() {
+        this._loadMonth(this.current.getFullYear(), this.current.getMonth());
 
-    /* BLACK DEPTH BASE */
-    linear-gradient(180deg, #000 0%, #020202 35%, #050506 60%, #000 100%);
-}
+        this._txUpdatedHandler = () =>
+            this._loadMonth(this.current.getFullYear(), this.current.getMonth());
 
+        EventBus.on("tx-updated", this._txUpdatedHandler);
+        EventBus.on("tx-added", this._txUpdatedHandler);
+        EventBus.on("tx-deleted", this._txUpdatedHandler);
+        EventBus.on("db-loaded", this._txUpdatedHandler);
 
-/* ==========================================
-   TOP GLASS OVERLAY (Perfect glossy dark top)
-   ========================================== */
-.top-glass {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 165px;
+        this._bind();
+    }
 
-  background: rgba(0, 0, 0, 0.55);        /* Dark but transparent */
-  border-radius: 0 0 25px 25px;           /* Rounded bottom like iOS cards */
+    disconnectedCallback() {
+        try {
+            EventBus.off("tx-updated", this._txUpdatedHandler);
+            EventBus.off("tx-added", this._txUpdatedHandler);
+            EventBus.off("tx-deleted", this._txUpdatedHandler);
+            EventBus.off("db-loaded", this._txUpdatedHandler);
+        } catch (e) { }
+    }
 
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    _bind() {
+        const root = this.shadowRoot;
+        root.addEventListener("touchstart", (e) => this._onTouchStart(e), { passive: true });
+        root.addEventListener("touchmove", (e) => this._onTouchMove(e), { passive: true });
+        root.addEventListener("touchend", (e) => this._onTouchEnd(e), { passive: true });
+    }
 
-  backdrop-filter: blur(9px) saturate(180%);
-  -webkit-backdrop-filter: blur(9px) saturate(180%);
+    _onTouchStart(e) {
+        const t = e.touches[0];
+        this._touch.start = t.clientX;
+        this._touch.x = t.clientX;
+    }
 
-  pointer-events: none;
-  z-index: 10;
-}
+    _onTouchMove(e) {
+        const t = e.touches[0];
+        this._touch.x = t.clientX;
+    }
 
-/* LIGHT overall glass */
-.gloss-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+    _onTouchEnd() {
+        if (this._isAnimating) return;
+        const dx = this._touch.x - this._touch.start;
+        const thresh = 60;
 
-  backdrop-filter: blur(6px) saturate(180%) brightness(1.18);
-  -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.18);
+        if (dx < -thresh) this._changeMonth(-1);
+        else if (dx > thresh) this._changeMonth(1);
 
-  opacity: 0.30;
-  z-index: 2;
-}
+        this._touch = { x: 0, y: 0, start: 0 };
+    }
 
-/* BLOOMS */
-.bloom-1 {
-  position: absolute;
-  width: 220px;
-  height: 220px;
-  top: 80px;
-  left: -40px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 70%);
-  filter: blur(55px);
-  opacity: 0.25;
-  z-index: 1;
-}
+    _changeMonth(dir) {
+        if (this._isAnimating) return;
+        this._isAnimating = true;
 
-.bloom-2 {
-  position: absolute;
-  width: 340px;
-  height: 340px;
-  top: 28%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(38, 208, 206, 0.35), transparent 75%);
-  filter: blur(75px);
-  opacity: 0.28;
-  z-index: 1;
-}
+        const d = new Date(this.current.getFullYear(), this.current.getMonth() + dir, 1);
+        this.current = d;
 
-/* GLOSS STREAK */
-.gloss-streak {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(120deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 25%);
-  opacity: 0.35;
-  z-index: 5;
-}
+        const content = this.shadowRoot.getElementById("aiContent");
+        if (content) {
+            content.style.opacity = "0";
+            content.style.transform = `translateX(${dir * 20}px)`;
+        }
 
+        setTimeout(() => {
+            this._loadMonth(d.getFullYear(), d.getMonth());
+            setTimeout(() => {
+                if (content) {
+                    content.style.transition = "all 0.3s ease";
+                    content.style.opacity = "1";
+                    content.style.transform = "translateX(0)";
+                }
+                setTimeout(() => {
+                    if (content) content.style.transition = "";
+                    this._isAnimating = false;
+                }, 300);
+            }, 50);
+        }, 150);
 
+        if (navigator.vibrate) navigator.vibrate(10);
+    }
 
-    </style>
+    async _loadMonth(year, month) {
+        try {
+            const yearMonth = `${year}-${String(month + 1).padStart(2, "0")}`;
+            this.tx = await getMonthTransactions(yearMonth);
+            this._calculateCategoryData();
+            this._render();
+        } catch (e) {
+            console.error("Failed to load AI screen:", e);
+        }
+    }
 
-    <div class="glossy-container">
-  <div class="gloss-layer"></div>
+    _calculateCategoryData() {
+        const data = {};
 
-  <div class="bloom-1"></div>
-  <div class="bloom-2"></div>
+        for (const t of this.tx) {
+            const cat = t.catName || "Uncategorized";
+            if (!data[cat]) {
+                data[cat] = { name: cat, total: 0, count: 0, avgAmount: 0, lastTransaction: null };
+            }
+            data[cat].total += Number(t.amount || 0);
+            data[cat].count++;
+            data[cat].lastTransaction = t.date;
+        }
 
-  <div class="gloss-streak"></div>
+        for (const cat in data) {
+            data[cat].avgAmount = data[cat].total / data[cat].count;
+        }
 
-  <!-- PERFECT DARK GLOSS TOP OVERLAY -->
-  <div class="top-glass"></div>
-</div>
+        this.categoryData = data;
+    }
 
-  `;
-}
+    _getHeatmapColor(value, min, max) {
+        if (max === min) return "#06b6d4";
+        const normalized = (value - min) / (max - min);
 
+        if (normalized < 0.33) return `hsl(186, 100%, ${70 - normalized * 20}%)`;
+        if (normalized < 0.66) return `hsl(45, 100%, ${60 - (normalized - 0.33) * 20}%)`;
+        return `hsl(10, 100%, ${50 - (normalized - 0.66) * 20}%)`;
+    }
+
+    _renderCategoryHeatmap() {
+        const categories = Object.values(this.categoryData).sort((a, b) => b.total - a.total);
+        if (categories.length === 0) {
+            return `
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <div class="empty-text">No transactions this month</div>
+                </div>`;
+        }
+
+        const totals = categories.map(c => c.total);
+        const min = Math.min(...totals);
+        const max = Math.max(...totals);
+
+        return categories.map(cat => {
+            const color = this._getHeatmapColor(cat.total, min, max);
+            const percent = ((cat.total - min) / (max - min)) * 100;
+
+            return `
+                <div class="heatmap-item">
+                    <div class="heatmap-header">
+                        <span class="cat-name">${this._esc(cat.name)}</span>
+                        <span class="cat-count">${cat.count} txn</span>
+                    </div>
+                    <div class="heatmap-bar-wrapper">
+                        <div class="heatmap-bar" style="width:${percent}%; background:${color};"></div>
+                    </div>
+                    <div class="heatmap-stats">
+                        <span class="total">₹${Math.abs(Math.round(cat.total))}</span>
+                        <span class="avg">Avg: ₹${Math.abs(Math.round(cat.avgAmount))}</span>
+                    </div>
+                </div>`;
+        }).join("");
+    }
+
+    _fmtCurrency(n) {
+        try {
+            return new Intl.NumberFormat("en-IN", {
+                style: "currency",
+                currency: "INR",
+                maximumFractionDigits: 0,
+            }).format(n);
+        } catch {
+            return "₹" + Math.round(n);
+        }
+    }
+
+    _esc(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    _renderInsights() {
+        const categories = Object.values(this.categoryData).sort((a, b) => b.total - a.total);
+        if (categories.length === 0) return "";
+
+        const top = categories[0];
+        const avg =
+            this.tx.reduce((s, t) => s + Math.abs(Number(t.amount || 0)), 0) / this.tx.length;
+        const max = Math.max(...this.tx.map(t => Math.abs(Number(t.amount || 0))));
+
+        return `
+            <div class="insight-card">
+                <div class="insight-icon">🎯</div>
+                <div class="insight-content">
+                    <div class="insight-title">Top Category</div>
+                    <div class="insight-value">${this._esc(top.name)}</div>
+                    <div class="insight-detail">${this._fmtCurrency(top.total)}</div>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">📊</div>
+                <div class="insight-content">
+                    <div class="insight-title">Average Transaction</div>
+                    <div class="insight-value">${this._fmtCurrency(avg)}</div>
+                    <div class="insight-detail">${this.tx.length} transactions</div>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">💰</div>
+                <div class="insight-content">
+                    <div class="insight-title">Highest Transaction</div>
+                    <div class="insight-value">${this._fmtCurrency(max)}</div>
+                    <div class="insight-detail">Single transaction</div>
+                </div>
+            </div>`;
+    }
+
+    _render() {
+        const monthLabel = this.current.toLocaleString(undefined, {
+            month: "long",
+            year: "numeric",
+        });
+
+        const totalSpent = this.tx.reduce((s, t) => s + Number(t.amount || 0), 0);
+
+        const html = `
+            <div class="month-selector">
+                <span class="month-name">${monthLabel}</span>
+                <span class="swipe-hint">← Swipe to change →</span>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-content">
+                    <div class="summary-stat">
+                        <div class="stat-label">Total Spent</div>
+                        <div class="stat-value">${this._fmtCurrency(totalSpent)}</div>
+                    </div>
+
+                    <div class="summary-stat">
+                        <div class="stat-label">Categories</div>
+                        <div class="stat-value">${Object.keys(this.categoryData).length}</div>
+                    </div>
+
+                    <div class="summary-stat">
+                        <div class="stat-label">Transactions</div>
+                        <div class="stat-value">${this.tx.length}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="heatmap-section">
+                <h2 class="section-title">Category Heatmap</h2>
+                <p class="section-subtitle">Spending intensity by category</p>
+                <div class="heatmap-container">
+                    ${this._renderCategoryHeatmap()}
+                </div>
+            </div>
+
+            <div class="insights-section">
+                <h2 class="section-title">Quick Insights</h2>
+                <div class="insights-grid">
+                    ${this._renderInsights()}
+                </div>
+            </div>
+        `;
+
+        this.shadowRoot.getElementById("aiContent").innerHTML = html;
+    }
 }
 
 customElements.define("ai-screen", AIScreen);

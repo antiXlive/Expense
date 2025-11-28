@@ -2,31 +2,16 @@ window.screenLayouts = window.screenLayouts || {};
 
 screenLayouts.ai = function () {
 
-    // ==========================
-    // JUST THE IMAGE ARRAY
-    // ==========================
     const aiImages = [
         "ai.jpg",
-        "ai1.png",
         "ai2.jpg",
-        "ai3.png",
-        "ai4.jpg",
-        "ai5.jpg",
         "ai6.jpg",
-        "ai7.jpg",
-        "ai8.jpg",
         "ai9.jpg",
-        "ai10.jpg",
         "ai11.jpg",
-        "ai12.jpg",
         "ai13.jpg",
         "ai14.jpg",
-        "ai15.jpg",
     ];
 
-    // ==========================
-    // CSS for AI screen only
-    // ==========================
     const aiStyles = `
         <style>
             .ai-screen {
@@ -57,30 +42,66 @@ screenLayouts.ai = function () {
                 position: absolute;
                 inset: 0;
                 z-index: 3;
-                padding: 22px;
+                padding: 20px;
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 22px;
-                color: white;
-                font-weight: 500;
-                text-align: center;
+                flex-direction: column;
+                gap: 20px;
+                overflow-y: auto;
             }
 
-            /* Mobile Fullscreen Mode */
-            @media (max-width: 600px) {
-                .ai-screen,
-                .ai-bg,
-                .ai-glass {
-                    border-radius: 0 !important;
+            .ai-title {
+                font-size: 26px;
+                font-weight: 700;
+                color: #fff;
+                margin-bottom: 6px;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            }
+
+            .glass-card {
+                background: rgba(255,255,255,0.12);
+                border: 1px solid rgba(255,255,255,0.25);
+                backdrop-filter: blur(30px) saturate(170%);
+                -webkit-backdrop-filter: blur(30px) saturate(170%);
+                border-radius: 20px;
+                padding: 18px 20px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+                color: #fff;
+                width: 100%;
+            }
+
+            .glass-card h3 {
+                margin: 0 0 8px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            .glass-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 6px;
+                font-size: 15px;
+            }
+
+            .card-row {
+                display: flex;
+                gap: 20px;
+            }
+
+            .card-row .glass-card {
+                width: 50%;
+            }
+
+            @media (max-width: 420px) {
+                .card-row {
+                    flex-direction: column;
+                }
+                .card-row .glass-card {
+                    width: 100%;
                 }
             }
         </style>
     `;
 
-    // ==========================
-    // Build one phone per image
-    // ==========================
     function buildPhone(image) {
         return `
         <div class="theme-block">
@@ -88,27 +109,115 @@ screenLayouts.ai = function () {
 
             <div class="mobile-frame">
                 <div class="mobile-content">
-
                     <div class="ai-screen">
-                        <div class="ai-bg" style="background-image:url('./${image}')"></div>
 
+                        <div class="ai-bg" style="background-image:url('./${image}')"></div>
                         <div class="ai-glass"></div>
 
                         <div class="ai-content">
-                           
-                        </div>
-                    </div>
 
+                            <div class="ai-title">AI Expense Summary</div>
+
+                            <!-- FULL WIDTH CARD -->
+                            <div class="glass-card">
+                                <h3>💰 Monthly Summary</h3>
+                                <div class="glass-row">
+                                    <span>Total Spent</span><strong>₹12,540</strong>
+                                </div>
+                                <div class="glass-row">
+                                    <span>Compared to last month</span>
+                                    <span style="color:#ff7676">+8.2%</span>
+                                </div>
+                                <div class="glass-row">
+                                    <span>Top Category</span><strong>Food & Dining</strong>
+                                </div>
+                                <div class="glass-row">
+                                    <span>Remaining Days</span><strong>11 days</strong>
+                                </div>
+                            </div>
+
+                            <!-- 2 CARDS ROW -->
+                            <div class="card-row">
+
+                                <div class="glass-card">
+                                    <h3>📊 Top Categories</h3>
+                                    <div class="glass-row"><span>🍽️ Food</span><strong>₹4,020</strong></div>
+                                    <div class="glass-row"><span>🛍️ Shopping</span><strong>₹3,100</strong></div>
+                                    <div class="glass-row"><span>🚕 Travel</span><strong>₹1,880</strong></div>
+                                    <div class="glass-row"><span>🏡 Rent</span><strong>₹17,000</strong></div>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3>📈 Trend</h3>
+                                    <div class="glass-row"><span>This week</span><span style="color:#4ade80">-12%</span></div>
+                                    <div class="glass-row"><span>Daily Average</span><strong>₹420</strong></div>
+                                    <div class="glass-row"><span>Peak Day</span><strong>Saturday</strong></div>
+                                    <div class="glass-row"><span>Lowest Spend Day</span><strong>Monday</strong></div>
+                                </div>
+
+                            </div>
+
+                            <!-- ANOTHER 2 CARDS ROW -->
+                            <div class="card-row">
+
+                                <div class="glass-card">
+                                    <h3>💡 Smart Tip</h3>
+                                    You spent 22% more on food delivery this month.
+                                    <br><br>
+                                    Try switching 2 orders/week to home cooking → Save <b>₹900/month</b>.
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3>🧠 Insights</h3>
+                                    <div class="glass-row">
+                                        <span>High spend hour</span> <strong>7pm–10pm</strong>
+                                    </div>
+                                    <div class="glass-row">
+                                        <span>Weekend avg</span> <strong>₹980/day</strong>
+                                    </div>
+                                    <br>
+                                    You tend to spend more on Fridays.
+                                </div>
+
+                            </div>
+
+                            <!-- FULL WIDTH CARD -->
+                            <div class="glass-card">
+                                <h3>🔁 Recurring Payments</h3>
+                                <div class="glass-row"><span>Netflix</span><strong>₹649 – 4 days</strong></div>
+                                <div class="glass-row"><span>Spotify</span><strong>₹129 – Tomorrow</strong></div>
+                                <div class="glass-row"><span>Prime</span><strong>₹299 – 11 days</strong></div>
+                                <div class="glass-row"><span>Rent</span><strong>₹17,000 – Due Soon</strong></div>
+                            </div>
+
+                            <!-- 2 CARDS ROW -->
+                            <div class="card-row">
+
+                                <div class="glass-card">
+                                    <h3>📉 Cash Flow</h3>
+                                    <div class="glass-row"><span>Income</span><strong>₹42,000</strong></div>
+                                    <div class="glass-row"><span>Expenses</span><strong>₹12,540</strong></div>
+                                    <div class="glass-row"><span>Balance</span><strong>₹29,460</strong></div>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3>🤖 AI Forecast</h3>
+                                    Projected Spend:
+                                    <div style="margin-top:6px; font-size:17px; font-weight:600;">₹18,400</div>
+                                    <div style="color:#fca5a5; margin-top:4px;">↑ 6% higher than last month</div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>`;
     }
 
-    // ==========================
-    // LOOP ONLY ON IMAGES
-    // ==========================
     let html = aiStyles;
     aiImages.forEach(img => html += buildPhone(img));
-
     return html;
 };
