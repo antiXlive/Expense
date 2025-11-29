@@ -7,6 +7,70 @@ screenLayouts.home = function () {
     // -----------------------------------
     const themes = [
         {
+            name: "Champions Navy",
+            bg: "#081427",
+            text: "#FFFFFF",
+            subtext: "#9DB4D0",
+            subtleText: "#7A8FA8",
+            expenseColor: "#FF5563",
+            iconBg: "rgba(255,255,255,0.06)",
+            transactionBg: "rgba(255,255,255,0.04)"
+        }
+        ,
+        {
+            name: "Stadium Blue",
+            bg: "#0A1B3D",
+            text: "#E8EEFF",
+            subtext: "#8CA6D9",
+            subtleText: "#7E92B8",
+            expenseColor: "#FF4F5E",
+            iconBg: "rgba(100,140,255,0.18)",
+            transactionBg: "rgba(255,255,255,0.05)"
+        }
+        ,
+        {
+            name: "Midnight Pitch",
+            bg: "#050B16",
+            text: "#F2F7FF",
+            subtext: "#7E8FA8",
+            subtleText: "#63738C",
+            expenseColor: "#FF5E79",
+            iconBg: "rgba(255,255,255,0.07)",
+            transactionBg: "rgba(255,255,255,0.03)"
+        }
+        ,
+        {
+            name: "Neon Club Lights",
+            bg: "#0A1225",
+            text: "#F3F7FF",
+            subtext: "#9BB4E0",
+            subtleText: "#6F82A3",
+            expenseColor: "#FF4667",
+            iconBg: "rgba(0,190,255,0.12)",
+            transactionBg: "rgba(0,190,255,0.08)"
+        }
+        , {
+            name: "Blue Steel Aura",
+            bg: "#0A1A26",
+            text: "#EAF3FF",
+            subtext: "#A1BDD9",
+            subtleText: "#7F9AB8",
+            expenseColor: "#FF5671",
+            iconBg: "rgba(255,255,255,0.10)",
+            transactionBg: "rgba(255,255,255,0.06)"
+        }
+        , {
+            name: "Premier Dark",
+            bg: "#0A0F22",
+            text: "#F5F7FF",
+            subtext: "#A0AFCE",
+            subtleText: "#7081A8",
+            expenseColor: "#FF6A6A",
+            iconBg: "rgba(255,255,255,0.08)",
+            transactionBg: "rgba(255,255,255,0.05)"
+        }
+        ,
+        {
             name: "Fintech Dark Blue",
             bg: "#0F172A",
             text: "#FFFFFF",

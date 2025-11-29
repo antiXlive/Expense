@@ -19,7 +19,7 @@ class AIScreen extends HTMLElement {
     async render() {
         // Load external CSS once and reuse for all instances
         if (!AIScreen.sharedCSS) {
-            const cssText = await fetch("./ai-screen.css").then(r => r.text());
+            const cssText = await fetch("../components/ai-screen.css").then(r => r.text());
             const sheet = new CSSStyleSheet();
             sheet.replaceSync(cssText);
             AIScreen.sharedCSS = sheet;

@@ -22,21 +22,32 @@ screenLayouts.ai = function () {
             }
 
             .ai-bg {
-                position: absolute;
-                inset: 0;
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                z-index: 1;
-            }
+    position: absolute;
+    inset: 0;
+
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 0, 102, 0.55), transparent 60%),
+        radial-gradient(circle at 80% 20%, rgba(255, 128, 0, 0.40), transparent 60%),
+        radial-gradient(circle at 50% 80%, rgba(0, 168, 255, 0.45), transparent 65%),
+        linear-gradient(180deg, #000000 0%, #0A0A0A 100%);
+
+    background-blend-mode: screen;
+    filter: blur(40px) brightness(1.1);
+    z-index: 1;
+}
+
 
             .ai-glass {
-                position: absolute;
-                inset: 0;
-                -webkit-backdrop-filter: blur(60px) saturate(160%);
-                backdrop-filter: blur(30px) saturate(160%);
-                z-index: 2;
-            }
+    position: absolute;
+    inset: 0;
+
+    -webkit-backdrop-filter: blur(100px) saturate(250%);
+    backdrop-filter: blur(100px) saturate(250%);
+    
+    background: rgba(0, 0, 0, 0.18); /* subtle dark film */
+    z-index: 2;
+}
+
 
             .ai-content {
                 position: absolute;
@@ -58,16 +69,20 @@ screenLayouts.ai = function () {
             }
 
             .glass-card {
-                background: rgba(255,255,255,0.12);
-                border: 1px solid rgba(255,255,255,0.25);
-                backdrop-filter: blur(30px) saturate(170%);
-                -webkit-backdrop-filter: blur(30px) saturate(170%);
-                border-radius: 20px;
-                padding: 18px 20px;
-                box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-                color: #fff;
-                width: 100%;
-            }
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(45px) saturate(200%);
+    -webkit-backdrop-filter: blur(45px) saturate(200%);
+
+    border-radius: 28px;
+    padding: 20px;
+    box-shadow: 
+        0 4px 25px rgba(0,0,0,0.25),
+        inset 0 0 20px rgba(255,255,255,0.05);
+
+    color: #fff;
+}
+
 
             .glass-card h3 {
                 margin: 0 0 8px;
