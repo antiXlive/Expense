@@ -17,17 +17,7 @@ screenLayouts.home = function () {
             transactionBg: "rgba(255,255,255,0.04)"
         }
         ,
-        {
-            name: "Stadium Blue",
-            bg: "#0A1B3D",
-            text: "#E8EEFF",
-            subtext: "#8CA6D9",
-            subtleText: "#7E92B8",
-            expenseColor: "#FF4F5E",
-            iconBg: "rgba(100,140,255,0.18)",
-            transactionBg: "rgba(255,255,255,0.05)"
-        }
-        ,
+        
         {
             name: "Midnight Pitch",
             bg: "#050B16",
@@ -89,16 +79,6 @@ screenLayouts.home = function () {
             expenseColor: "#FF3B30",
             iconBg: "rgba(255,255,255,0.10)",
             transactionBg: "rgba(255,255,255,0.08)"
-        },
-        {
-            name: "Ocean Night",
-            bg: "#041014",
-            text: "#E6FAFF",
-            subtext: "#8fe7f7",
-            subtleText: "#8fe7f7",
-            expenseColor: "#ff708a",
-            iconBg: "rgba(6,182,212,0.22)",
-            transactionBg: "rgba(255,255,255,0.05)"
         }
     ];
 
@@ -191,7 +171,7 @@ screenLayouts.home = function () {
         return `
         <div class="day-group">
             <div class="day-header" style="color:${theme.subtleText}">
-                <span>${label}</span>
+                <span>${label} | ${theme.name}</span>
                 <span style="color:${theme.expenseColor}">-$${total}</span>
             </div>
 
