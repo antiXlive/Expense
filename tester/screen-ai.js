@@ -4,12 +4,21 @@ screenLayouts.ai = function () {
 
     const aiImages = [
         "ai.jpg",
+        "ai1.png",
         "ai2.jpg",
+        "ai3.png",
+        "ai4.jpg",
+        "ai5.jpg",
         "ai6.jpg",
+        "ai7.jpg",
+        "ai8.jpg",
         "ai9.jpg",
+        "ai10.jpg",
         "ai11.jpg",
+        "ai12.jpg",
         "ai13.jpg",
         "ai14.jpg",
+        "ai15.jpg",
     ];
 
     const aiStyles = `
